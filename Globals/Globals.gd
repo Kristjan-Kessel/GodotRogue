@@ -1,5 +1,18 @@
 extends Node
 
 # Global variables
-var map_width: int = 80   # Width of the dungeon map
-var map_height: int = 24  # Height of the dungeon map
+var map_width: int = 80
+var map_height: int = 24
+var rng_seed: int = 4154772241
+var rng: RandomNumberGenerator = RandomNumberGenerator.new()
+
+# Set the randomness seed for reproducibility
+func initialize_randomness():
+	if rng_seed == -1:
+		rng_seed = randi()
+	rng.seed = rng_seed
+
+# Function to set a specific seed
+func set_seed(new_seed: int):
+	rng_seed = new_seed
+	initialize_randomness()
