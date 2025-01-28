@@ -1,7 +1,7 @@
 extends Node
 
 # Global variables
-var map_width: int = 80
+var map_width: int = 72
 var map_height: int = 24
 var rng_seed: int = 4154772241
 var rng: RandomNumberGenerator = RandomNumberGenerator.new()

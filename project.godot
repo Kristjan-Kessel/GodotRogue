@@ -11,10 +11,11 @@ config_version=5
 [application]
 
 config/name="GodotRogue"
-run/main_scene="res://Scenes/main.tscn"
+run/main_scene="res://Scenes/Main.tscn"
 config/features=PackedStringArray("4.3", "Forward Plus")
 config/icon="res://icon.svg"
 
 [autoload]
 
 Globals="*res://Globals/Globals.gd"
+Constants="*res://Globals/Constants.gd"
