@@ -1,9 +1,18 @@
-[gd_scene load_steps=3 format=3 uid="uid://cv4l8fxqy3bof"]
+[gd_scene load_steps=4 format=3 uid="uid://cv4l8fxqy3bof"]
 
 [ext_resource type="Script" path="res://Scripts/main.gd" id="1_iie3f"]
-[ext_resource type="PackedScene" uid="uid://c4h6rcw6j1p8" path="res://Scenes/Level.tscn" id="2_tyo10"]
+[ext_resource type="FontFile" uid="uid://bx2lyt3o5pdbd" path="res://RobotoMono-Medium.ttf" id="3_hncvb"]
+[ext_resource type="Script" path="res://Scripts/player.gd" id="3_s7dad"]
 
 [node name="Main" type="Node2D"]
 script = ExtResource("1_iie3f")
 
-[node name="Level" parent="." instance=ExtResource("2_tyo10")]
+[node name="Player" type="Node2D" parent="."]
+script = ExtResource("3_s7dad")
+
+[node name="Label" type="Label" parent="."]
+offset_right = 40.0
+offset_bottom = 23.0
+theme_override_fonts/font = ExtResource("3_hncvb")
+
+[connection signal="player_move" from="Player" to="." method="_on_player_move"]
