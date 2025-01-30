@@ -4,6 +4,7 @@ signal action_taken()
 signal player_move(new_position)
 
 var position : Vector2 = Vector2.ZERO
+var ascii = Constants.PLAYER
 
 func _ready() -> void:
 	pass
