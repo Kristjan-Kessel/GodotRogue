@@ -4,34 +4,32 @@ var map_data : Array = []
 @onready var level = $Label
 @onready var player = $Player
 
+var test_map = [
+	["|", "-", "-", "|", " ", " ", " ", "|", "-", "-", "|"],
+	["|", "@", ".", "+", "#", "#", "#", "+", ".", ".", "|"],
+	["|", ".", ".", "|", " ", " ", " ", "|", ".", ".", "|"],
+	["|", "-", "-", "|", " ", " ", " ", "|", "-", "-", "|"],
+]
+
 func _ready():
 	Globals.initialize_randomness()
 	print("Using seed: ", Globals.rng_seed)
-	generate_map()
+	var ascii_map = test_map #LevelGenerator.generate_basic_room(Globals.map_width, Globals.map_height)
+	map_data = LevelGenerator.convert_ascii_to_tiles(ascii_map, player)
+	
 	render_map()
-
-func generate_map():
-	map_data.clear()
-	for y in range(Globals.map_height):
-		var row = []
-		for x in range(Globals.map_width):
-			row.append(Tile.new("floor", true, Constants.FLOOR))
-		map_data.append(row)
-
-	var start_pos = Vector2(Globals.map_width / 2, Globals.map_height / 2)
-	map_data[start_pos.y][start_pos.x].entity = player
-	player.position = start_pos
 
 func render_map():
 	var map_str = ""
-	for y in range(Globals.map_height):
-		for x in range(Globals.map_width):
+	for y in range(map_data.size()):
+		for x in range(map_data[y].size()):
 			var tile = map_data[y][x]
 			if tile.entity == null:
 				map_str += tile.ascii
 			else:
 				map_str += tile.entity.ascii
-		map_str += "\n"	
+		map_str += "\n"
+
 	level.text = map_str
 
 func _on_player_move(new_position: Vector2) -> void:
