@@ -9,7 +9,7 @@ var ascii = Constants.PLAYER
 func _ready() -> void:
 	pass
 
-func _process(delta: float) -> void:
+func _process(_delta: float) -> void:
 	var move_direction = Vector2.ZERO;
 	if Input.is_action_just_pressed("ui_up"):
 		move_direction = Vector2(0, -1)
@@ -22,4 +22,4 @@ func _process(delta: float) -> void:
 	else:
 		return
 	
-	emit_signal("player_move", position+move_direction)
+	player_move.emit(position+move_direction)

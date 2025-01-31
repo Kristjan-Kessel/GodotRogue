@@ -38,7 +38,7 @@ func _on_player_move(new_position: Vector2) -> void:
 	new_position.y = clamp(new_position.y, 0, Globals.map_height - 1)
 
 	var target_tile = map_data[new_position.y][new_position.x]
-	if target_tile.walkable and target_tile.entity == null:
+	if true: #target_tile.walkable and target_tile.entity == null:
 		map_data[player.position.y][player.position.x].entity = null
 		player.position = new_position
 		map_data[new_position.y][new_position.x].entity = player
