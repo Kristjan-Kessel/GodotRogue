@@ -2,17 +2,58 @@ extends Node
 
 class_name LevelGenerator
 
-static func generate_basic_room(width: int, height: int) -> Array:
+const min_room_width = 16
+const min_room_height = 4
+
+static func generate_level() -> Array:
 	var map = []
-	for y in range(height):
+	
+	#make empty array with the max width and height
+	for y in range(Globals.map_height):
 		var row = []
-		for x in range(width):
-			if y == 0 or y == height - 1 or x == 0 or x == width - 1:
-				row.append(Constants.WALL)
-			else:
-				row.append(Constants.FLOOR)
+		for x in range(Globals.map_width):
+			row.append(Constants.EMPTY);
 		map.append(row)
+	
+	var player_spawned = false
+	for y in range(3):
+		for x in range(3):
+			# x and y are room starting points
+			var max_width = Globals.map_width/3
+			var max_height = Globals.map_height/3
+			var start_x = Globals.map_width/3*x
+			var start_y = Globals.map_height/3*y
+			
+			var x_offset = Globals.level_rng.randi_range(1,4)
+			var y_offset = Globals.level_rng.randi_range(1,3)
+			
+			start_x += x_offset
+			start_y += y_offset
+			max_width -= x_offset
+			max_height -= y_offset
+			
+			var width = Globals.level_rng.randi_range(min_room_width,max_width)
+			var height = Globals.level_rng.randi_range(min_room_height,max_height)
+			
+			generate_basic_room(map,start_x,start_y,width,height)
+			
+			if(!player_spawned):
+				if(Globals.level_rng.randf()>0.66 || (y==2 && x==2)):
+					map[start_y+height/2][start_x+width/2] = Constants.PLAYER
+					player_spawned = true;
+			
 	return map
+
+static func generate_basic_room(map: Array, start_x: int,start_y: int,width: int, height: int):
+	for y in range(height):
+		for x in range(width):
+			if(x == 0 || x==width-1):
+				map[start_y+y][start_x+x] = Constants.WALL
+			elif(y == 0 || y==height-1):
+				map[start_y+y][start_x+x] = Constants.CEILING
+			else:
+				map[start_y+y][start_x+x] = Constants.FLOOR
+
 
 static func convert_ascii_to_tiles(ascii_map: Array, player: Node) -> Array:
 	var tile_map = []

@@ -15,7 +15,7 @@ var test_map = [
 func _ready():
 	Globals.initialize_randomness()
 	print("Using seed: ", Globals.rng_seed)
-	var ascii_map = test_map #LevelGenerator.generate_basic_room(Globals.map_width, Globals.map_height)
+	var ascii_map = LevelGenerator.generate_level()
 	map_data = LevelGenerator.convert_ascii_to_tiles(ascii_map, player)
 	
 	render_map()
@@ -44,7 +44,7 @@ func _on_player_move(new_position: Vector2) -> void:
 		map_data[new_position.y][new_position.x].entity = player
 	
 	#ui.update_stats(player.hp, player.gold, player.level)  # Update stats
-	ui.set_log_message("You moved to " + str(new_position))  # Log movement
+	ui.set_log_message("You moved to " + str(player.position))  # Log movement
 	on_action_taken();
 
 func on_action_taken():
