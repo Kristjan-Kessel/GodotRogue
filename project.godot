@@ -19,3 +19,11 @@ config/icon="res://icon.svg"
 
 Globals="*res://Globals/Globals.gd"
 Constants="*res://Globals/Constants.gd"
+
+[display]
+
+window/stretch/mode="viewport"
+
+[gui]
+
+theme/custom_font="res://RobotoMono-Medium.ttf"

@@ -1,14 +1,15 @@
 extends Node2D
 
 var map_data : Array = []
-@onready var level = $Label
+@onready var level = $UI/MapLabel
 @onready var player = $Player
+@onready var ui = $UI
 
 var test_map = [
-	["|", "-", "-", "|", " ", " ", " ", "|", "-", "-", "|"],
-	["|", "@", ".", "+", "#", "#", "#", "+", ".", ".", "|"],
-	["|", ".", ".", "|", " ", " ", " ", "|", ".", ".", "|"],
-	["|", "-", "-", "|", " ", " ", " ", "|", "-", "-", "|"],
+	["","|", "-", "-", "|", " ", " ", " ", "|", "-", "-", "|"],
+	["","|", "@", ".", "+", "#", "#", "#", "+", ".", ".", "|"],
+	["","|", ".", ".", "|", " ", " ", " ", "|", ".", ".", "|"],
+	["","|", "-", "-", "|", " ", " ", " ", "|", "-", "-", "|"],
 ]
 
 func _ready():
@@ -42,6 +43,8 @@ func _on_player_move(new_position: Vector2) -> void:
 		player.position = new_position
 		map_data[new_position.y][new_position.x].entity = player
 	
+	#ui.update_stats(player.hp, player.gold, player.level)  # Update stats
+	ui.set_log_message("You moved to " + str(new_position))  # Log movement
 	on_action_taken();
 
 func on_action_taken():
