@@ -55,27 +55,18 @@ static func select_and_generate_corridors(map: Array, room_grid: Array, room_vec
 	var orphan_rooms = Array(room_vector_list)
 	var current_room = room_vector_list[Globals.level_rng.randi_range(0,8)]
 	var connected_rooms = []
+	var initial_path_length = 1
 	orphan_rooms.erase(current_room)
 	connected_rooms.append(current_room)
 	
 	while orphan_rooms.size()>0:
-		var valid_rooms = get_valid_neighbouring_rooms(orphan_rooms,current_room)
-		if valid_rooms.size() == 0:
-			print(orphan_rooms.size())
-			for orphan in orphan_rooms:
-				valid_rooms = get_valid_neighbouring_rooms(connected_rooms,orphan)
-				if valid_rooms.size() > 0:
-					var next_room = valid_rooms[Globals.level_rng.randi_range(0,valid_rooms.size()-1)]
-					generate_corridor_between_rooms(map,room_grid,orphan,next_room)
-					orphan_rooms.erase(orphan)
-					connected_rooms.append(orphan)
-			pass
-		else:
-			var next_room = valid_rooms[Globals.level_rng.randi_range(0,valid_rooms.size()-1)]
-			generate_corridor_between_rooms(map,room_grid,current_room,next_room)
-			current_room = next_room
-			orphan_rooms.erase(current_room)
-			connected_rooms.append(current_room)
+		for orphan in orphan_rooms:
+			var valid_rooms = get_valid_neighbouring_rooms(connected_rooms,orphan)
+			if valid_rooms.size() > 0:
+				var next_room = valid_rooms[Globals.level_rng.randi_range(0,valid_rooms.size()-1)]
+				generate_corridor_between_rooms(map,room_grid,orphan,next_room)
+				orphan_rooms.erase(orphan)
+				connected_rooms.append(orphan)
 
 static func get_valid_neighbouring_rooms(room_vector_list: Array, room: Vector2) -> Array:
 	var valid_rooms = []
