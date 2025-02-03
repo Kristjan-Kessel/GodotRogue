@@ -2,12 +2,15 @@ extends Node
 
 class_name LevelGenerator
 
-const min_room_width = 24
+const min_room_width = 10
 const min_room_height = 4
+const min_room_offset_x = 1
+const min_room_offset_y = 1
 
 static func generate_level() -> Array:
 	var map = []
-	var rooms = [[null,null,null],[null,null,null],[null,null,null]]
+	var room_grid = [[null,null,null],[null,null,null],[null,null,null]]
+	var room_vector_list = []
 	#make empty array with the max width and height
 	for y in range(Globals.map_height):
 		var row = []
@@ -25,8 +28,8 @@ static func generate_level() -> Array:
 			var start_x = Globals.map_width/3*x
 			var start_y = Globals.map_height/3*y
 			
-			var x_offset = Globals.level_rng.randi_range(1,4)
-			var y_offset = Globals.level_rng.randi_range(1,3)
+			var x_offset = Globals.level_rng.randi_range(min_room_offset_x,max_width-min_room_width)
+			var y_offset = Globals.level_rng.randi_range(min_room_offset_y,max_height-min_room_height)
 			
 			start_x += x_offset
 			start_y += y_offset
@@ -37,34 +40,63 @@ static func generate_level() -> Array:
 			var height = Globals.level_rng.randi_range(min_room_height,max_height)
 			
 			var room = Rect2(start_x,start_y,width,height)
-			generate_basic_room(map,room)
+			generate_room(map,room)
 			if(loop_count==player_loop):
 				map[start_y+height/2][start_x+width/2] = Constants.PLAYER
-			rooms[y][x] = room
+			room_grid[y][x] = room
+			room_vector_list.append(Vector2(x,y))
 			loop_count+=1
 	
-	generate_corridor_between_rooms(map, rooms, Vector2(0,0), Vector2(0,1))
-	generate_corridor_between_rooms(map, rooms, Vector2(0,1), Vector2(0,2))
+	select_and_generate_corridors(map,room_grid,room_vector_list)
 	
-	generate_corridor_between_rooms(map, rooms, Vector2(0,0), Vector2(1,0))
-	generate_corridor_between_rooms(map, rooms, Vector2(1,0), Vector2(2,0))
-	
-	generate_corridor_between_rooms(map, rooms, Vector2(0,1), Vector2(1,1))
-	generate_corridor_between_rooms(map, rooms, Vector2(1,1), Vector2(2,1))
-	generate_corridor_between_rooms(map, rooms, Vector2(0,2), Vector2(1,2))
-	generate_corridor_between_rooms(map, rooms, Vector2(2,2), Vector2(1,2))
 	return map
+
+static func select_and_generate_corridors(map: Array, room_grid: Array, room_vector_list: Array):
+	var orphan_rooms = Array(room_vector_list)
+	var current_room = room_vector_list[Globals.level_rng.randi_range(0,8)]
+	var connected_rooms = []
+	orphan_rooms.erase(current_room)
+	connected_rooms.append(current_room)
+	
+	while orphan_rooms.size()>0:
+		var valid_rooms = get_valid_neighbouring_rooms(orphan_rooms,current_room)
+		if valid_rooms.size() == 0:
+			print(orphan_rooms.size())
+			for orphan in orphan_rooms:
+				valid_rooms = get_valid_neighbouring_rooms(connected_rooms,orphan)
+				if valid_rooms.size() > 0:
+					var next_room = valid_rooms[Globals.level_rng.randi_range(0,valid_rooms.size()-1)]
+					generate_corridor_between_rooms(map,room_grid,orphan,next_room)
+					orphan_rooms.erase(orphan)
+					connected_rooms.append(orphan)
+			pass
+		else:
+			var next_room = valid_rooms[Globals.level_rng.randi_range(0,valid_rooms.size()-1)]
+			generate_corridor_between_rooms(map,room_grid,current_room,next_room)
+			current_room = next_room
+			orphan_rooms.erase(current_room)
+			connected_rooms.append(current_room)
+
+static func get_valid_neighbouring_rooms(room_vector_list: Array, room: Vector2) -> Array:
+	var valid_rooms = []
+	for i in room_vector_list:
+		var distance = abs((i-room))
+		if distance == Vector2(1,0) || distance == Vector2(0,1):
+			valid_rooms.append(i)
+
+	return valid_rooms
+
 
 static func generate_corridor_between_rooms(map: Array, rooms: Array, start_vector: Vector2, end_vector: Vector2):
 	var start_room: Rect2 = rooms[start_vector.y][start_vector.x]
 	var end_room: Rect2 = rooms[end_vector.y][end_vector.x]
 	
-	var horizontal = start_vector.x != end_vector.x
+	var is_horizontal = start_vector.x != end_vector.x
 	
 	var start = Vector2(0,0)
 	var end = Vector2(0,0)
 	
-	if(horizontal):
+	if is_horizontal:
 		start.y = Globals.level_rng.randi_range(start_room.position.y+1,start_room.position.y+start_room.size.y-2)
 		end.y = Globals.level_rng.randi_range(end_room.position.y+1,end_room.position.y+end_room.size.y-2)
 		var dir = end_vector.x-start_vector.x
@@ -84,28 +116,58 @@ static func generate_corridor_between_rooms(map: Array, rooms: Array, start_vect
 		else:
 			start.y = start_room.position.y
 			end.y = end_room.position.y+end_room.size.y-1
-	print(start)
-	print(end)
-	generate_corridor(map,start,end)
+	
+	var cursor = start
+	var direction = (end - cursor).sign()
+	var total_distance = (end - start).abs()
 
-static func generate_corridor(map: Array, start: Vector2, end: Vector2):
-	var i = start
-	var direction = (end-i).sign()
 	while true:
-		if map[i.y][i.x] == Constants.WALL || map[i.y][i.x] == Constants.CEILING:
-			map[i.y][i.x] = Constants.DOOR
+		var cell = map[cursor.y][cursor.x]
+		if map[cursor.y][cursor.x] == Constants.WALL || map[cursor.y][cursor.x] == Constants.CEILING:
+			map[cursor.y][cursor.x] = Constants.DOOR
 		else:
-			map[i.y][i.x] = Constants.CORRIDOR
-			
-		if i.distance_to(end)==0:
+			map[cursor.y][cursor.x] = Constants.CORRIDOR
+		
+		if cursor == end:
 			break
 		
-		if(i.x != end.x):
-			i.x+=direction.x
+		var current_distance = (end - cursor).abs()
+		
+		# Make sure a corridor wont be drawn through multiple walls.
+		# If possible (based on distance between rooms), make it so the corridor wont touch the wall of the start and end room sides
+		if is_horizontal:
+			var move_horizontal = (cursor.x == start.x) or (total_distance.x > 3 and cursor.x == start.x + direction.x)
+			var move_vertical = ((total_distance.x > 3 and current_distance.x == 2) or (current_distance.x == 1)) and (end.y != cursor.y)
+			
+			if move_horizontal:
+				cursor.x += direction.x
+				continue
+			elif move_vertical:
+				cursor.y += direction.y
+				continue
 		else:
-			i.y+=direction.y
+			var move_vertical = (cursor.y == start.y) or (total_distance.y > 3 and cursor.y == start.y + direction.y)
+			var move_horizontal = ((total_distance.y > 3 and current_distance.y == 2) or (current_distance.y == 1)) and (end.x != cursor.x)
+			
+			if move_vertical:
+				cursor.y += direction.y
+				continue
+			elif move_horizontal:
+				cursor.x += direction.x
+				continue
+		
+		# Ensures that the corridor wont overshoot the end destination
+		if cursor.x == end.x:
+			cursor.y += direction.y
+		elif cursor.y == end.y:
+			cursor.x += direction.x
+		else:
+			if Globals.level_rng.randi_range(0, 1) == 1:
+				cursor.x += direction.x
+			else:
+				cursor.y += direction.y
 
-static func generate_basic_room(map: Array, room: Rect2):
+static func generate_room(map: Array, room: Rect2):
 	for y in range(room.size.y):
 		for x in range(room.size.x):
 			if(y == 0 || y==room.size.y-1):

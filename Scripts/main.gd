@@ -15,9 +15,16 @@ var test_map = [
 func _ready():
 	Globals.initialize_randomness()
 	print("Using seed: ", Globals.rng_seed)
+	
+	new_level()
+
+func _process(delta: float) -> void:
+	if Input.is_action_just_pressed("ui_accept"):
+		new_level()
+
+func new_level():
 	var ascii_map = LevelGenerator.generate_level()
 	map_data = LevelGenerator.convert_ascii_to_tiles(ascii_map, player)
-	
 	render_map()
 
 func render_map():
@@ -38,7 +45,7 @@ func _on_player_move(new_position: Vector2) -> void:
 	new_position.y = clamp(new_position.y, 0, Globals.map_height - 1)
 
 	var target_tile = map_data[new_position.y][new_position.x]
-	if true: #target_tile.walkable and target_tile.entity == null:
+	if target_tile.walkable and target_tile.entity == null:
 		map_data[player.position.y][player.position.x].entity = null
 		player.position = new_position
 		map_data[new_position.y][new_position.x].entity = player
