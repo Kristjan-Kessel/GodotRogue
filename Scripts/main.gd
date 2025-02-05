@@ -50,8 +50,8 @@ func _on_player_move(new_position: Vector2) -> void:
 		player.position = new_position
 		map_data[new_position.y][new_position.x].entity = player
 	
-	#ui.update_stats(player.hp, player.gold, player.level)  # Update stats
-	ui.set_log_message("You moved to " + str(player.position))  # Log movement
+	ui.update_stats(player)
+	ui.set_log_message("You moved to " + str(player.position))
 	on_action_taken();
 
 func on_action_taken():

@@ -6,6 +6,18 @@ signal player_move(new_position)
 var position : Vector2 = Vector2.ZERO
 var ascii = Constants.PLAYER
 
+var level = 1
+var max_hp = 12
+var current_hp = 12 : set = _set_current_hp
+var strength = 10
+var armor = 10
+var gold = 0
+var current_exp = 0
+var max_exp = 1
+
+func _set_current_hp(new_hp):
+	current_hp = clamp(new_hp,0,max_hp)
+
 func _ready() -> void:
 	pass
 
