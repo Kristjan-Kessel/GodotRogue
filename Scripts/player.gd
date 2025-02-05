@@ -12,8 +12,16 @@ var current_hp = 12 : set = _set_current_hp
 var strength = 10
 var armor = 10
 var gold = 0
-var current_exp = 0
+var current_exp = 0 : set = _set_current_exp
 var max_exp = 1
+
+func _set_current_exp(new_exp):
+	current_exp = new_exp
+	if(new_exp >= max_exp):
+		#level up
+		level+=1
+		current_exp -= max_exp
+		max_exp+=1
 
 func _set_current_hp(new_hp):
 	current_hp = clamp(new_hp,0,max_hp)
