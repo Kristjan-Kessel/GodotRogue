@@ -108,22 +108,73 @@ static func generate_corridor_between_rooms(map: Array, rooms: Array, start_vect
 			start.y = start_room.position.y
 			end.y = end_room.position.y+end_room.size.y-1
 	
+	draw_corridor_shaped(start,end,map,is_horizontal)
+
+static func draw_corridor_shaped(start: Vector2, end: Vector2, map: Array, is_horizontal:bool):
+	var cursor = start
+	var direction = (end - cursor).sign()
+	var total_distance = (end - start).abs()
+	var first_turn = 0
+	if is_horizontal:
+		if total_distance.x>4:
+			first_turn = Globals.level_rng.randi_range(2,total_distance.x-2)
+		else:
+			first_turn = Globals.level_rng.randi_range(1,total_distance.x-1)
+	else:
+		if total_distance.y>4:
+			first_turn = Globals.level_rng.randi_range(2,total_distance.y-2)
+		else:
+			first_turn = Globals.level_rng.randi_range(1,total_distance.y-1)
+	
+	var counter = 0
+	while true:
+		carve_corridor_cell(cursor,map)
+		
+		if counter==first_turn || cursor==end:
+			break
+		
+		if is_horizontal:
+			cursor.x += direction.x
+		else:
+			cursor.y += direction.y
+			
+		counter+=1
+	
+	while true:
+		carve_corridor_cell(cursor,map)
+		
+		if cursor==end || (is_horizontal && cursor.y==end.y) || (!is_horizontal && cursor.x==end.x):
+			break
+		
+		if !is_horizontal:
+			cursor.x += direction.x
+		else:
+			cursor.y += direction.y
+		
+	while true:
+		carve_corridor_cell(cursor,map)
+		
+		if cursor==end:
+			break
+		
+		if is_horizontal:
+			cursor.x += direction.x
+		else:
+			cursor.y += direction.y
+	
+static func draw_corridor_randomly(start: Vector2, end: Vector2, map: Array, is_horizontal:bool):
 	var cursor = start
 	var direction = (end - cursor).sign()
 	var total_distance = (end - start).abs()
 
 	while true:
-		var cell = map[cursor.y][cursor.x]
-		if map[cursor.y][cursor.x] == Constants.WALL || map[cursor.y][cursor.x] == Constants.CEILING:
-			map[cursor.y][cursor.x] = Constants.DOOR
-		else:
-			map[cursor.y][cursor.x] = Constants.CORRIDOR
+		carve_corridor_cell(cursor,map)
 		
 		if cursor == end:
 			break
 		
 		var current_distance = (end - cursor).abs()
-		
+
 		# Make sure a corridor wont be drawn through multiple walls.
 		# If possible (based on distance between rooms), make it so the corridor wont touch the wall of the start and end room sides
 		if is_horizontal:
@@ -157,6 +208,12 @@ static func generate_corridor_between_rooms(map: Array, rooms: Array, start_vect
 				cursor.x += direction.x
 			else:
 				cursor.y += direction.y
+
+static func carve_corridor_cell(cursor: Vector2, map: Array):
+	if map[cursor.y][cursor.x] == Constants.WALL || map[cursor.y][cursor.x] == Constants.CEILING:
+		map[cursor.y][cursor.x] = Constants.DOOR
+	else:
+		map[cursor.y][cursor.x] = Constants.CORRIDOR
 
 static func generate_room(map: Array, room: Rect2):
 	for y in range(room.size.y):
