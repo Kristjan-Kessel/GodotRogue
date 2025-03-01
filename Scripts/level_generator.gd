@@ -233,21 +233,21 @@ static func convert_ascii_to_tiles(ascii_map: Array, player: Node) -> Array:
 			var tile = null
 			match ascii_map[y][x]:
 				Constants.WALL:
-					tile = Tile.new("wall", false, Constants.WALL)
+					tile = Tile.new("WALL", false, Constants.WALL,false)
 				Constants.CEILING:
-					tile = Tile.new("wall", false, Constants.CEILING)
+					tile = Tile.new("WALL", false, Constants.CEILING,false)
 				Constants.FLOOR:
-					tile = Tile.new("floor", true, Constants.FLOOR)
+					tile = Tile.new("FLOOR", true, Constants.FLOOR,false)
 				Constants.DOOR:
-					tile = Tile.new("door", true, Constants.DOOR)
+					tile = Tile.new("DOOR", true, Constants.DOOR,true)
 				Constants.CORRIDOR:
-					tile = Tile.new("corridor",true,Constants.CORRIDOR)
+					tile = Tile.new("CORRIDOR",true,Constants.CORRIDOR,false)
 				Constants.PLAYER:
-					tile = Tile.new("floor",true,Constants.FLOOR)
+					tile = Tile.new("FLOOR",true,Constants.FLOOR,false)
 					player.position = Vector2(x,y);
 					tile.entity = player			
 				_:
-					tile = Tile.new("empty", false,Constants.EMPTY)
+					tile = Tile.new("EMPTY", false,Constants.EMPTY, false)
 			row.append(tile)
 		tile_map.append(row)
 	return tile_map

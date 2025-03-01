@@ -43,4 +43,6 @@ vertical_alignment = 1
 [node name="Player" type="Node2D" parent="."]
 script = ExtResource("3_s7dad")
 
+[connection signal="command_find" from="Player" to="." method="_on_player_command_find"]
+[connection signal="log_message" from="Player" to="." method="_on_player_log_message"]
 [connection signal="player_move" from="Player" to="." method="_on_player_move"]
