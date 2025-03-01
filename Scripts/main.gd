@@ -15,7 +15,7 @@ var test_map = [
 func _ready():
 	Globals.initialize_randomness()
 	print("Using seed: ", Globals.rng_seed)
-	
+	ui.update_stats(player)
 	new_level()
 
 func get_tile(position: Vector2) -> Tile:
@@ -58,13 +58,13 @@ func move_player(new_position: Vector2) -> bool:
 		map_data[new_position.y][new_position.x].entity = player
 		moved = true
 	
-	ui.update_stats(player)
 	ui.set_log_message("You moved to " + str(player.position))
 	on_action_taken();
 	return moved
 	
 func on_action_taken():
 	render_map()
+	ui.update_stats(player)
 
 func _on_player_log_message(new_message: Variant) -> void:
 	ui.set_log_message(new_message)
