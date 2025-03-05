@@ -1,9 +1,9 @@
 [gd_scene load_steps=5 format=3 uid="uid://cv4l8fxqy3bof"]
 
-[ext_resource type="Script" path="res://Scripts/main.gd" id="1_iie3f"]
-[ext_resource type="Script" path="res://Scripts/ui.gd" id="2_vud5e"]
+[ext_resource type="Script" uid="uid://bkvy11motn7uh" path="res://Scripts/main.gd" id="1_iie3f"]
+[ext_resource type="Script" uid="uid://caphlodsvhhrj" path="res://Scripts/ui.gd" id="2_vud5e"]
 [ext_resource type="FontFile" uid="uid://bx2lyt3o5pdbd" path="res://RobotoMono-Medium.ttf" id="3_hncvb"]
-[ext_resource type="Script" path="res://Scripts/player.gd" id="3_s7dad"]
+[ext_resource type="Script" uid="uid://3fxjowsrxau2" path="res://Scripts/player.gd" id="3_s7dad"]
 
 [node name="Main" type="Node2D"]
 script = ExtResource("1_iie3f")
