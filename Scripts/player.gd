@@ -4,6 +4,8 @@ signal action_taken()
 signal player_move(new_position)
 signal log_message(new_message)
 signal command_find(direction)
+signal open_inventory()
+signal close_menu()
 
 var ascii = Constants.PLAYER
 
@@ -28,8 +30,11 @@ var current_exp = 0 : set = _set_current_exp
 var max_exp = 1
 
 # Commands
-enum CommandType {NONE, FIND, REST, MOVE} # For commands that take an argument to execute (ex: direction)
+enum CommandType {NONE, FIND, REST, MOVE, INVENTORY} # For commands that take an argument to execute (ex: direction)
 var current_command = CommandType.NONE
+
+# Inventory
+var inventory = [Item.new("Totem of debugging","Used to test if the inventory is functioning correctly","*")]
 
 func _set_current_exp(new_exp):
 	current_exp = new_exp
@@ -53,6 +58,11 @@ func _process(delta: float) -> void:
 				current_command = CommandType.MOVE
 			else:
 				current_command = CommandType.NONE
+	
+	if current_command == CommandType.INVENTORY:
+		if Input.is_action_just_pressed("continue"):
+			current_command = CommandType.NONE
+			close_menu.emit()
 	
 	if current_command == CommandType.MOVE:
 		var new_direction = Vector2.ZERO
@@ -111,6 +121,9 @@ func _process(delta: float) -> void:
 			current_command = CommandType.REST
 			action_taken.emit()
 			clear_command()
+		elif Input.is_action_just_pressed("command_inventory"):
+			current_command = CommandType.INVENTORY
+			open_inventory.emit()
 
 func clear_command():
 	post_command_delay_timer = 0.1 

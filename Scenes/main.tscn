@@ -14,8 +14,8 @@ anchor_left = 0.5
 anchor_right = 0.5
 offset_left = 11.0
 offset_top = 4.0
-offset_right = 1144.0
-offset_bottom = 643.0
+offset_right = 1271.0
+offset_bottom = 707.0
 grow_horizontal = 2
 script = ExtResource("2_vud5e")
 
@@ -23,27 +23,30 @@ script = ExtResource("2_vud5e")
 layout_mode = 2
 theme_override_fonts/font = ExtResource("3_hncvb")
 theme_override_font_sizes/font_size = 24
-text = "You hit the emu and miss"
 
 [node name="MapLabel" type="Label" parent="UI"]
 layout_mode = 2
-size_flags_vertical = 6
+size_flags_horizontal = 0
+size_flags_vertical = 2
 theme_override_fonts/font = ExtResource("3_hncvb")
 theme_override_font_sizes/font_size = 18
-vertical_alignment = 1
 
 [node name="StatsLabel" type="Label" parent="UI"]
 layout_mode = 2
 size_flags_vertical = 10
 theme_override_fonts/font = ExtResource("3_hncvb")
 theme_override_font_sizes/font_size = 24
-text = "Level:1 Hits:12(12) Str:16(16) Gold:5 Armor:5 exp:1/1"
-vertical_alignment = 1
+vertical_alignment = 3
 
 [node name="Player" type="Node2D" parent="."]
 script = ExtResource("3_s7dad")
 
+[node name="Camera2D" type="Camera2D" parent="."]
+position = Vector2(638, 362)
+
 [connection signal="action_taken" from="Player" to="." method="on_action_taken"]
+[connection signal="close_menu" from="Player" to="." method="_on_player_close_menu"]
 [connection signal="command_find" from="Player" to="." method="_on_player_command_find"]
 [connection signal="log_message" from="Player" to="." method="_on_player_log_message"]
+[connection signal="open_inventory" from="Player" to="." method="_on_player_open_inventory"]
 [connection signal="player_move" from="Player" to="." method="_on_player_move"]

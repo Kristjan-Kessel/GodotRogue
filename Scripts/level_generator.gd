@@ -238,6 +238,8 @@ static func convert_ascii_to_tiles(ascii_map: Array, player: Node) -> Array:
 					tile = Tile.new("WALL", false, Constants.CEILING,false)
 				Constants.FLOOR:
 					tile = Tile.new("FLOOR", true, Constants.FLOOR,false)
+					if Globals.level_rng.randi_range(1,10) == 1:
+						tile.item = Gold.new()
 				Constants.DOOR:
 					tile = Tile.new("DOOR", true, Constants.DOOR,true)
 				Constants.CORRIDOR:

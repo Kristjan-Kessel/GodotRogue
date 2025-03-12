@@ -35,30 +35,49 @@ func render_map():
 	for y in range(map_data.size()):
 		for x in range(map_data[y].size()):
 			var tile = map_data[y][x]
-			if tile.entity == null:
-				map_str += tile.ascii
-			else:
+			if tile.entity != null:
 				map_str += tile.entity.ascii
+			elif tile.item != null:
+				map_str += tile.item.ascii
+			else:
+				map_str += tile.ascii
 		map_str += "\n"
 
+	level.text = map_str
+
+func render_inventory():
+	var map_str = ""
+	for i in range(0,player.inventory.size()):
+		var item = player.inventory[i]
+		map_str += Constants.INVENTORY_CHARS[i]+") "
+		map_str += item.label
+		map_str += "\n"
+	
+	ui.set_stats_message("- Press space to continue -")
 	level.text = map_str
 
 func _on_player_move(new_position: Vector2) -> void:
 	move_player(new_position)
 
 func move_player(new_position: Vector2) -> bool:
+	ui.set_log_message("")
+	
 	new_position.x = clamp(new_position.x, 0, Globals.map_width - 1)
 	new_position.y = clamp(new_position.y, 0, Globals.map_height - 1)
 	var moved = false
 	
-	var target_tile = map_data[new_position.y][new_position.x]
+	var target_tile = get_tile(new_position)
 	if target_tile.is_walkable and target_tile.entity == null:
-		map_data[player.position.y][player.position.x].entity = null
+		get_tile(player.position).entity = null
 		player.position = new_position
-		map_data[new_position.y][new_position.x].entity = player
+		target_tile.entity = player
 		moved = true
-	
-	ui.set_log_message("You moved to " + str(player.position))
+		if target_tile.item != null:
+			var item = target_tile.item
+			item.on_pickup(player, target_tile)
+			ui.set_log_message("You picked up "+item.label)
+			target_tile.item = null
+	#ui.set_log_message("You moved to " + str(player.position))
 	on_action_taken();
 	return moved
 	
@@ -103,3 +122,11 @@ func _on_player_command_find(direction: Vector2) -> void:
 			else:
 				break
 		
+
+
+func _on_player_open_inventory() -> void:
+	render_inventory()
+
+func _on_player_close_menu() -> void:
+	render_map()
+	ui.update_stats(player)

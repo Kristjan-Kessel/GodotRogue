@@ -4,6 +4,7 @@ extends Node
 var type: String
 var is_walkable: bool
 var entity: Node = null
+var item: Node = null
 var ascii: String
 var is_important: bool
 
