@@ -5,6 +5,8 @@ var map_data : Array = []
 @onready var player = $Player
 @onready var ui = $UI
 
+var log_message = ""
+
 var test_map = [
 	["","|", "-", "-", "|", " ", " ", " ", "|", "-", "-", "|"],
 	["","|", "@", ".", "+", "#", "#", "#", "+", ".", ".", "|"],
@@ -31,7 +33,7 @@ func new_level():
 	render_map()
 
 func render_map():
-	var map_str = ""
+	var map_str = log_message+"\n"
 	for y in range(map_data.size()):
 		for x in range(map_data[y].size()):
 			var tile = map_data[y][x]
@@ -60,7 +62,7 @@ func _on_player_move(new_position: Vector2) -> void:
 	move_player(new_position)
 
 func move_player(new_position: Vector2) -> bool:
-	ui.set_log_message("")
+	log_message = ""
 	
 	new_position.x = clamp(new_position.x, 0, Globals.map_width - 1)
 	new_position.y = clamp(new_position.y, 0, Globals.map_height - 1)
@@ -75,9 +77,9 @@ func move_player(new_position: Vector2) -> bool:
 		if target_tile.item != null:
 			var item = target_tile.item
 			item.on_pickup(player, target_tile)
-			ui.set_log_message("You picked up "+item.label)
+			log_message = "You picked up "+item.label
 			target_tile.item = null
-	#ui.set_log_message("You moved to " + str(player.position))
+	
 	on_action_taken();
 	return moved
 	
@@ -86,7 +88,8 @@ func on_action_taken():
 	ui.update_stats(player)
 
 func _on_player_log_message(new_message: Variant) -> void:
-	ui.set_log_message(new_message)
+	log_message = new_message
+	render_map()
 
 func _on_player_command_find(direction: Vector2) -> void:
 	var bypass_important = true
@@ -101,11 +104,11 @@ func _on_player_command_find(direction: Vector2) -> void:
 		var right_tile = get_tile(player.position + right_direction)
 		
 		if !bypass_important:
-			if left_tile.is_important:
+			if left_tile.is_interesting():
 				break
-			if right_tile.is_important:
+			if right_tile.is_interesting():
 				break
-			if next_tile.is_important:
+			if next_tile.is_interesting():
 				break
 		bypass_important = false
 		var moved = move_player(new_position)
@@ -123,10 +126,9 @@ func _on_player_command_find(direction: Vector2) -> void:
 				break
 		
 
-
 func _on_player_open_inventory() -> void:
 	render_inventory()
 
-func _on_player_close_menu() -> void:
+func _on_player_render_map() -> void:
 	render_map()
 	ui.update_stats(player)

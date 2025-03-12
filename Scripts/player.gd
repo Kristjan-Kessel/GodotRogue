@@ -5,7 +5,7 @@ signal player_move(new_position)
 signal log_message(new_message)
 signal command_find(direction)
 signal open_inventory()
-signal close_menu()
+signal render_map()
 
 var ascii = Constants.PLAYER
 
@@ -62,7 +62,7 @@ func _process(delta: float) -> void:
 	if current_command == CommandType.INVENTORY:
 		if Input.is_action_just_pressed("continue"):
 			current_command = CommandType.NONE
-			close_menu.emit()
+			render_map.emit()
 	
 	if current_command == CommandType.MOVE:
 		var new_direction = Vector2.ZERO

@@ -19,11 +19,6 @@ offset_bottom = 707.0
 grow_horizontal = 2
 script = ExtResource("2_vud5e")
 
-[node name="LogLabel" type="Label" parent="UI"]
-layout_mode = 2
-theme_override_fonts/font = ExtResource("3_hncvb")
-theme_override_font_sizes/font_size = 24
-
 [node name="MapLabel" type="Label" parent="UI"]
 layout_mode = 2
 size_flags_horizontal = 0
@@ -45,8 +40,8 @@ script = ExtResource("3_s7dad")
 position = Vector2(638, 362)
 
 [connection signal="action_taken" from="Player" to="." method="on_action_taken"]
-[connection signal="close_menu" from="Player" to="." method="_on_player_close_menu"]
 [connection signal="command_find" from="Player" to="." method="_on_player_command_find"]
 [connection signal="log_message" from="Player" to="." method="_on_player_log_message"]
 [connection signal="open_inventory" from="Player" to="." method="_on_player_open_inventory"]
 [connection signal="player_move" from="Player" to="." method="_on_player_move"]
+[connection signal="render_map" from="Player" to="." method="_on_player_render_map"]
