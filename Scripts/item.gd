@@ -11,4 +11,4 @@ func _init(_label: String, _description: String, _ascii: String):
 	ascii = _ascii
 
 func on_pickup(player: Node, tile: Tile):
-	print("picked up: ")
+	player.inventory.append(self)

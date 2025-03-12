@@ -6,6 +6,7 @@ signal log_message(new_message)
 signal command_find(direction)
 signal open_inventory()
 signal render_map()
+signal drop_item(item)
 
 var ascii = Constants.PLAYER
 
@@ -30,7 +31,7 @@ var current_exp = 0 : set = _set_current_exp
 var max_exp = 1
 
 # Commands
-enum CommandType {NONE, FIND, REST, MOVE, INVENTORY} # For commands that take an argument to execute (ex: direction)
+enum CommandType {NONE, FIND, REST, MOVE, INVENTORY, DROP} # For commands that take an argument to execute (ex: direction)
 var current_command = CommandType.NONE
 
 # Inventory
@@ -59,12 +60,22 @@ func _process(delta: float) -> void:
 			else:
 				current_command = CommandType.NONE
 	
-	if current_command == CommandType.INVENTORY:
+	if current_command == CommandType.DROP:
+		for c in Constants.INVENTORY_CHARS:
+				if Input.is_key_pressed(OS.find_keycode_from_string(c)):
+					var index = Constants.INVENTORY_CHARS.find(c)
+					if index < inventory.size():
+						var item = inventory[index]
+						drop_item.emit(item)
+					else:
+						log_message.emit("Invalid item.")
+					current_command = CommandType.NONE
+					render_map.emit()
+	elif current_command == CommandType.INVENTORY:
 		if Input.is_action_just_pressed("continue"):
 			current_command = CommandType.NONE
 			render_map.emit()
-	
-	if current_command == CommandType.MOVE:
+	elif current_command == CommandType.MOVE:
 		var new_direction = Vector2.ZERO
 	
 		if Input.is_action_pressed("ui_up"):
@@ -124,6 +135,9 @@ func _process(delta: float) -> void:
 		elif Input.is_action_just_pressed("command_inventory"):
 			current_command = CommandType.INVENTORY
 			open_inventory.emit()
+		elif Input.is_action_just_pressed("command_drop"):
+			current_command = CommandType.DROP
+			log_message.emit("Choose an item to drop (a-z)")
 
 func clear_command():
 	post_command_delay_timer = 0.1 

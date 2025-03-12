@@ -24,8 +24,7 @@ func get_tile(position: Vector2) -> Tile:
 	return map_data[position.y][position.x]
 
 func _process(delta: float) -> void:
-	if Input.is_action_just_pressed("ui_accept"):
-		new_level()
+	pass
 
 func new_level():
 	var ascii_map = LevelGenerator.generate_level()
@@ -132,3 +131,15 @@ func _on_player_open_inventory() -> void:
 func _on_player_render_map() -> void:
 	render_map()
 	ui.update_stats(player)
+
+func _on_player_drop_item(item: Variant) -> void:
+	var tile = get_tile(player.position)
+	if tile.item != null:
+		log_message = "Tile already has item."
+		return
+	
+	tile.item = item
+	log_message = "You dropped "+item.label
+	player.inventory.erase(item)
+	
+	render_map()

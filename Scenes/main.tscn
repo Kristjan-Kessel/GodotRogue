@@ -41,6 +41,7 @@ position = Vector2(638, 362)
 
 [connection signal="action_taken" from="Player" to="." method="on_action_taken"]
 [connection signal="command_find" from="Player" to="." method="_on_player_command_find"]
+[connection signal="drop_item" from="Player" to="." method="_on_player_drop_item"]
 [connection signal="log_message" from="Player" to="." method="_on_player_log_message"]
 [connection signal="open_inventory" from="Player" to="." method="_on_player_open_inventory"]
 [connection signal="player_move" from="Player" to="." method="_on_player_move"]
