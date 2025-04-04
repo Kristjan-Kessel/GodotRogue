@@ -7,11 +7,16 @@ const min_room_height = 4
 const min_room_offset_x = 1
 const min_room_offset_y = 1
 
+#how likely it is for any given room to not existing, 1/room_chance
+const room_chance = 10
+const max_missing_rooms = 1
+
+
 static func generate_level() -> Array:
 	var map = []
 	var room_grid = [[null,null,null],[null,null,null],[null,null,null]]
 	var room_vector_list = []
-	#make empty array with the max width and height
+
 	for y in range(Globals.map_height):
 		var row = []
 		for x in range(Globals.map_width):
@@ -19,30 +24,44 @@ static func generate_level() -> Array:
 		map.append(row)
 	
 	var loop_count = 0
-	var player_loop = Globals.level_rng.randi_range(0,8)
+	var player_room = Globals.level_rng.randi_range(0,8)
+	var exit_room = Globals.level_rng.randi_range(0,8)
+	var missing_room_count = 0
 	for y in range(3):
 		for x in range(3):
-			# x and y are room starting points
+			var is_spawn_room = loop_count == player_room
+			var is_exit_room = loop_count == exit_room
+			var skip_room = Globals.level_rng.randi_range(1,room_chance) == 1 && !is_spawn_room && !is_exit_room && missing_room_count < max_missing_rooms
+			
 			var max_width = Globals.map_width/3
 			var max_height = Globals.map_height/3
 			var start_x = Globals.map_width/3*x
 			var start_y = Globals.map_height/3*y
 			
-			var x_offset = Globals.level_rng.randi_range(min_room_offset_x,max_width-min_room_width)
-			var y_offset = Globals.level_rng.randi_range(min_room_offset_y,max_height-min_room_height)
+			var room
 			
-			start_x += x_offset
-			start_y += y_offset
-			max_width -= x_offset
-			max_height -= y_offset
+			if skip_room:
+				room = Rect2(Globals.level_rng.randi_range(start_x,start_x+max_width-1),Globals.level_rng.randi_range(start_y,start_y+max_height-1),1,1)
+				missing_room_count += 1
+			else:
+				var x_offset = Globals.level_rng.randi_range(min_room_offset_x,max_width-min_room_width)
+				var y_offset = Globals.level_rng.randi_range(min_room_offset_y,max_height-min_room_height)
 			
-			var width = Globals.level_rng.randi_range(min_room_width,max_width)
-			var height = Globals.level_rng.randi_range(min_room_height,max_height)
+				start_x += x_offset
+				start_y += y_offset
+				max_width -= x_offset
+				max_height -= y_offset
+				
+				var width = Globals.level_rng.randi_range(min_room_width,max_width)
+				var height = Globals.level_rng.randi_range(min_room_height,max_height)
+				
+				room = Rect2(start_x,start_y,width,height)
 			
-			var room = Rect2(start_x,start_y,width,height)
-			generate_room(map,room)
-			if(loop_count==player_loop):
-				map[start_y+height/2][start_x+width/2] = Constants.PLAYER
+			if !skip_room:
+				generate_room(map,room)
+			
+			if is_spawn_room:
+				map[start_y+room.size.y/2][start_x+room.size.x/2] = Constants.PLAYER
 			room_grid[y][x] = room
 			room_vector_list.append(Vector2(x,y))
 			loop_count+=1
@@ -53,7 +72,7 @@ static func generate_level() -> Array:
 
 static func select_and_generate_corridors(map: Array, room_grid: Array, room_vector_list: Array):
 	var orphan_rooms = Array(room_vector_list)
-	var current_room = room_vector_list[Globals.level_rng.randi_range(0,8)]
+	var current_room = room_vector_list[Globals.level_rng.randi_range(0,room_vector_list.size()-1)]
 	var connected_rooms = []
 	var initial_path_length = 1
 	orphan_rooms.erase(current_room)
@@ -107,6 +126,13 @@ static func generate_corridor_between_rooms(map: Array, rooms: Array, start_vect
 		else:
 			start.y = start_room.position.y
 			end.y = end_room.position.y+end_room.size.y-1
+			
+	if start_room.size.y==1:
+		start.y = start_room.position.y
+		start.x = start_room.position.x
+	if end_room.size.y==1:
+		end.y = end_room.position.y
+		end.x = end_room.position.x
 	
 	draw_corridor_shaped(start,end,map,is_horizontal)
 
@@ -238,8 +264,6 @@ static func convert_ascii_to_tiles(ascii_map: Array, player: Node) -> Array:
 					tile = Tile.new("WALL", false, Constants.CEILING,false)
 				Constants.FLOOR:
 					tile = Tile.new("FLOOR", true, Constants.FLOOR,false)
-					if Globals.level_rng.randi_range(1,10) == 1:
-						tile.item = Gold.new()
 				Constants.DOOR:
 					tile = Tile.new("DOOR", true, Constants.DOOR,true)
 				Constants.CORRIDOR:
@@ -247,9 +271,28 @@ static func convert_ascii_to_tiles(ascii_map: Array, player: Node) -> Array:
 				Constants.PLAYER:
 					tile = Tile.new("FLOOR",true,Constants.FLOOR,false)
 					player.position = Vector2(x,y);
-					tile.entity = player			
+					tile.entity = player
+				Constants.GOLD:
+					tile = Tile.new("FLOOR",true,Constants.FLOOR,false)
+					tile.item = Gold.new()
 				_:
 					tile = Tile.new("EMPTY", false,Constants.EMPTY, false)
 			row.append(tile)
 		tile_map.append(row)
 	return tile_map
+
+static func get_ascii_from_file(file_name: String) -> Array:
+	var path = "res://Test Levels/" + file_name
+	var result = []
+	
+	if FileAccess.file_exists(path):
+		var file = FileAccess.open(path, FileAccess.READ)
+		while !file.eof_reached():
+			var line = file.get_line()
+			var char_array = line.split("", false)
+			result.append(char_array)
+		file.close()
+	else:
+		print("File does not exist: " + path)
+	
+	return result

@@ -7,24 +7,23 @@ var map_data : Array = []
 
 var log_message = ""
 
-var test_map = [
-	["","|", "-", "-", "|", " ", " ", " ", "|", "-", "-", "|"],
-	["","|", "@", ".", "+", "#", "#", "#", "+", ".", ".", "|"],
-	["","|", ".", ".", "|", " ", " ", " ", "|", ".", ".", "|"],
-	["","|", "-", "-", "|", " ", " ", " ", "|", "-", "-", "|"],
-]
-
 func _ready():
 	Globals.initialize_randomness()
 	print("Using seed: ", Globals.rng_seed)
 	ui.update_stats(player)
-	new_level()
+	#new_level()
+	test_level()
 
 func get_tile(position: Vector2) -> Tile:
 	return map_data[position.y][position.x]
 
 func _process(delta: float) -> void:
 	pass
+
+func test_level():
+	var ascii_map = LevelGenerator.get_ascii_from_file("text.txt")
+	map_data = LevelGenerator.convert_ascii_to_tiles(ascii_map, player)
+	render_map()
 
 func new_level():
 	var ascii_map = LevelGenerator.generate_level()
