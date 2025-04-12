@@ -8,3 +8,4 @@ func _init():
 
 func on_pickup(player: Node, tile: Tile):
 	player.gold = player.gold+1
+	type = Type.GOLD

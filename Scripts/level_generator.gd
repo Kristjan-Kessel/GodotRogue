@@ -69,7 +69,7 @@ static func generate_level() -> Array:
 	select_and_generate_corridors(map,room_grid,room_vector_list)
 	
 	return map
-
+	
 static func select_and_generate_corridors(map: Array, room_grid: Array, room_vector_list: Array):
 	var orphan_rooms = Array(room_vector_list)
 	var current_room = room_vector_list[Globals.level_rng.randi_range(0,room_vector_list.size()-1)]
@@ -134,6 +134,7 @@ static func generate_corridor_between_rooms(map: Array, rooms: Array, start_vect
 		end.y = end_room.position.y
 		end.x = end_room.position.x
 	
+	#draw_corridor_randomly(start,end,map,is_horizontal)
 	draw_corridor_shaped(start,end,map,is_horizontal)
 
 static func draw_corridor_shaped(start: Vector2, end: Vector2, map: Array, is_horizontal:bool):

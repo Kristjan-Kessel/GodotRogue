@@ -10,9 +10,9 @@ var log_message = ""
 func _ready():
 	Globals.initialize_randomness()
 	print("Using seed: ", Globals.rng_seed)
-	ui.update_stats(player)
-	#new_level()
-	test_level()
+	ui.update_stats(player.stats)
+	new_level()
+	#test_level()
 
 func get_tile(position: Vector2) -> Tile:
 	return map_data[position.y][position.x]
@@ -45,7 +45,7 @@ func render_map():
 
 	level.text = map_str
 
-func render_inventory():
+func render_inventory(text: String):
 	var map_str = ""
 	for i in range(0,player.inventory.size()):
 		var item = player.inventory[i]
@@ -53,7 +53,7 @@ func render_inventory():
 		map_str += item.label
 		map_str += "\n"
 	
-	ui.set_stats_message("- Press space to continue -")
+	ui.set_stats_message(text)
 	level.text = map_str
 
 func _on_player_move(new_position: Vector2) -> void:
@@ -83,7 +83,7 @@ func move_player(new_position: Vector2) -> bool:
 	
 func on_action_taken():
 	render_map()
-	ui.update_stats(player)
+	ui.update_stats(player.stats)
 
 func _on_player_log_message(new_message: Variant) -> void:
 	log_message = new_message
@@ -124,12 +124,12 @@ func _on_player_command_find(direction: Vector2) -> void:
 				break
 		
 
-func _on_player_open_inventory() -> void:
-	render_inventory()
+func _on_player_open_inventory(text: String) -> void:
+	render_inventory(text)
 
 func _on_player_render_map() -> void:
 	render_map()
-	ui.update_stats(player)
+	ui.update_stats(player.stats)
 
 func _on_player_drop_item(item: Variant) -> void:
 	var tile = get_tile(player.position)

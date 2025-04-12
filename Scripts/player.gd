@@ -4,7 +4,7 @@ signal action_taken()
 signal player_move(new_position)
 signal log_message(new_message)
 signal command_find(direction)
-signal open_inventory()
+signal open_inventory(text)
 signal render_map()
 signal drop_item(item)
 
@@ -18,59 +18,71 @@ var move_delay_timer = 0.0
 var move_repeat_timer = 0.0
 const INITIAL_MOVE_DELAY = 0.3
 const REPEAT_RATE = 0.1
-var post_command_delay_timer = 0.0
+var action_delay_timer = 0.0
 
-# Player stats
-var level = 1
-var max_hp = 12
-var current_hp = 12 : set = _set_current_hp
-var strength = 10
-var armor = 10
-var gold = 0
-var current_exp = 0 : set = _set_current_exp
-var max_exp = 1
+var stats = Stats.new(1,12,10,10,0)
 
 # Commands
-enum CommandType {NONE, FIND, REST, MOVE, INVENTORY, DROP} # For commands that take an argument to execute (ex: direction)
+enum CommandType {NONE, FIND, MOVE, INVENTORY, DROP, WEAR_ARMOR, WIELD_WEAPON} # For commands that take an argument to execute (ex: direction)
 var current_command = CommandType.NONE
 
 # Inventory
-var inventory = [Item.new("Totem of debugging","Used to test if the inventory is functioning correctly","*")]
-
-func _set_current_exp(new_exp):
-	current_exp = new_exp
-	if(new_exp >= max_exp):
-		#level up
-		level+=1
-		current_exp -= max_exp
-		max_exp+=1
-
-func _set_current_hp(new_hp):
-	current_hp = clamp(new_hp,0,max_hp)
+var inventory = []
+var armor_item = null
+var weapon_item = Weapon.new("Dagger","Just a basic dagger","!",1)
 
 func _ready() -> void:
-	pass
+	inventory.append(Item.new("Totem of debugging","Used to test if the inventory is functioning correctly","*"))
+	inventory.append(Weapon.new("Sword +1","Grants +1 to damage and hit","!",1))
+	inventory.append(Armor.new("Armor +1","Grants +1 to armor","O",1))
 
 func _process(delta: float) -> void:
-	if post_command_delay_timer > 0.0:
-		post_command_delay_timer -= delta
-		if post_command_delay_timer <= 0.0:
-			if current_command == CommandType.FIND:
-				current_command = CommandType.MOVE
-			else:
-				current_command = CommandType.NONE
+	if action_delay_timer > 0.0:
+		action_delay_timer -= delta
+		return
 	
 	if current_command == CommandType.DROP:
-		for c in Constants.INVENTORY_CHARS:
-				if Input.is_key_pressed(OS.find_keycode_from_string(c)):
-					var index = Constants.INVENTORY_CHARS.find(c)
-					if index < inventory.size():
-						var item = inventory[index]
-						drop_item.emit(item)
-					else:
-						log_message.emit("Invalid item.")
+		if Input.is_action_just_pressed("view_options"):
+			open_inventory.emit("- Select an item to drop -")
+		else:	
+			var item = get_item_from_key()
+			if item != null:
+				drop_item.emit(item)
+		return
+	elif current_command == CommandType.WEAR_ARMOR:
+		if Input.is_action_just_pressed("view_options"):
+			open_inventory.emit("- Select an item to wear as armor -")
+		else:	
+			var item = get_item_from_key()
+			if item != null:
+				if item.type == item.Type.ARMOR:
+					if armor_item != null:
+						inventory.append(armor_item)
+					armor_item = item
+					inventory.erase(item)
+					log_message.emit("Wore "+item.label+" as armor.")
+				else:
+					log_message.emit("Invalid item.")
 					current_command = CommandType.NONE
 					render_map.emit()
+		return
+	elif current_command == CommandType.WIELD_WEAPON:
+		if Input.is_action_just_pressed("view_options"):
+			open_inventory.emit("- Select an item to wield as a weapon -")
+		else:	
+			var item = get_item_from_key()
+			if item != null:
+				if item.type == item.Type.WEAPON:
+					if weapon_item != null:
+						inventory.append(weapon_item)
+					weapon_item = item
+					inventory.erase(item)
+					log_message.emit("Wielded "+item.label+" as a weapon.")
+				else:
+					log_message.emit("Invalid item.")
+					current_command = CommandType.NONE
+					render_map.emit()
+		return
 	elif current_command == CommandType.INVENTORY:
 		if Input.is_action_just_pressed("continue"):
 			current_command = CommandType.NONE
@@ -129,19 +141,50 @@ func _process(delta: float) -> void:
 			current_command = CommandType.FIND
 			log_message.emit("Choose a direction to look")
 		elif Input.is_action_just_pressed("command_rest"):
-			current_command = CommandType.REST
 			action_taken.emit()
-			clear_command()
+			delay_actions(0.1)
 		elif Input.is_action_just_pressed("command_inventory"):
 			current_command = CommandType.INVENTORY
-			open_inventory.emit()
+			open_inventory.emit("- Press space to continue -")
 		elif Input.is_action_just_pressed("command_drop"):
 			current_command = CommandType.DROP
-			log_message.emit("Choose an item to drop (a-z)")
+			log_message.emit("Choose an item to drop (a-z). press (*) to view options")
+		elif Input.is_action_just_pressed("wear_armor"):
+			current_command = CommandType.WEAR_ARMOR
+			log_message.emit("Choose an item to wear as armor (a-z). press (*) to view options")
+		elif Input.is_action_just_pressed("wield_weapon"):
+			current_command = CommandType.WIELD_WEAPON
+			log_message.emit("Choose an item to wield as a weapon (a-z). press (*) to view options")
+		elif Input.is_action_just_pressed("take_armor_off"):
+			if armor_item != null:
+				inventory.append(armor_item)
+				armor_item = null
+				log_message.emit("Took off armor.")
+			else:
+				log_message.emit("No armor to take off.")
+			delay_actions(0.1)
+
+func delay_actions(delay: float):
+	action_delay_timer = delay
 
 func clear_command():
-	post_command_delay_timer = 0.1 
+	delay_actions(0.1)
+	current_command = CommandType.NONE
 
 func move_player():
 	if move_direction != Vector2.ZERO:
 		player_move.emit(position + move_direction)
+
+func get_item_from_key() -> Item:
+	for c in Constants.INVENTORY_CHARS:
+		if Input.is_key_pressed(OS.find_keycode_from_string(c)):
+			var index = Constants.INVENTORY_CHARS.find(c)
+			current_command = CommandType.NONE
+			render_map.emit()
+			if index < inventory.size():
+				var item = inventory[index]
+				#drop_item.emit(item)
+				return item
+			else:
+				log_message.emit("Invalid item.")
+	return null
