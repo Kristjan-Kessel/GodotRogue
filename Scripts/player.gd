@@ -59,12 +59,13 @@ func _process(delta: float) -> void:
 					if armor_item != null:
 						inventory.append(armor_item)
 					armor_item = item
+					stats.bonus_armor = armor_item.armor_bonus
 					inventory.erase(item)
 					log_message.emit("Wore "+item.label+" as armor.")
 				else:
 					log_message.emit("Invalid item.")
 					current_command = CommandType.NONE
-					render_map.emit()
+				render_map.emit()
 		return
 	elif current_command == CommandType.WIELD_WEAPON:
 		if Input.is_action_just_pressed("view_options"):
@@ -76,12 +77,13 @@ func _process(delta: float) -> void:
 					if weapon_item != null:
 						inventory.append(weapon_item)
 					weapon_item = item
+					stats.bonus_strength = weapon_item.strength_bonus
 					inventory.erase(item)
 					log_message.emit("Wielded "+item.label+" as a weapon.")
 				else:
 					log_message.emit("Invalid item.")
 					current_command = CommandType.NONE
-					render_map.emit()
+				render_map.emit()
 		return
 	elif current_command == CommandType.INVENTORY:
 		if Input.is_action_just_pressed("continue"):
@@ -160,6 +162,8 @@ func _process(delta: float) -> void:
 				inventory.append(armor_item)
 				armor_item = null
 				log_message.emit("Took off armor.")
+				stats.bonus_armor = 0
+				render_map.emit()
 			else:
 				log_message.emit("No armor to take off.")
 			delay_actions(0.1)

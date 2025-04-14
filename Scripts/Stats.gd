@@ -10,6 +10,9 @@ var gold: int = 0
 var current_exp: int = 0 : set = _set_current_exp
 var max_exp: int = 1
 
+var bonus_armor = 0
+var bonus_strength = 0
+
 func _init(_level: int, _max_hp: int, _strength: int, _armor: int, _gold: int):
 	level = _level
 	max_hp = _max_hp
@@ -28,3 +31,9 @@ func _set_current_exp(new_exp):
 
 func _set_current_hp(new_hp):
 	current_hp = clamp(new_hp,0,max_hp)
+
+func get_total_strength():
+	return strength+bonus_strength
+
+func get_total_armor():
+	return armor+bonus_armor
