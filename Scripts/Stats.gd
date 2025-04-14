@@ -16,7 +16,7 @@ var bonus_strength = 0
 func _init(_level: int, _max_hp: int, _strength: int, _armor: int, _gold: int):
 	level = _level
 	max_hp = _max_hp
-	current_hp = _max_hp
+	current_hp = _max_hp/2
 	strength = _strength
 	armor = _armor
 	gold = _gold

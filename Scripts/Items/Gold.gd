@@ -1,4 +1,4 @@
-extends "res://Scripts/item.gd"
+extends Item
 class_name Gold
 
 func _init():

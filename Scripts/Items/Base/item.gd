@@ -1,17 +1,19 @@
 class_name Item
 extends Node
 
-enum Type {ITEM, WEAPON, ARMOR, GOLD, CONSUMABLE}
+enum Type {ITEM, WEAPON, ARMOR, GOLD, USEABLE}
 
 var label: String
 var description: String
-var ascii: String
+var ascii = Constants.ITEM
 var type: Type = Type.ITEM
 
-func _init(_label: String, _description: String, _ascii: String):
+func _init(_label: String, _description: String):
 	label = _label
 	description = _description
-	ascii = _ascii
 
 func on_pickup(player: Node, tile: Tile):
 	player.inventory.append(self)
+
+func on_use(player: Node):
+	pass

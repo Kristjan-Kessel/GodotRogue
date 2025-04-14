@@ -23,19 +23,19 @@ var action_delay_timer = 0.0
 var stats = Stats.new(1,12,10,10,0)
 
 # Commands
-enum CommandType {NONE, FIND, MOVE, INVENTORY, DROP, WEAR_ARMOR, WIELD_WEAPON} # For commands that take an argument to execute (ex: direction)
+enum CommandType {NONE, FIND, MOVE, INVENTORY, DROP, WEAR_ARMOR, WIELD_WEAPON, USE_ITEM} # For commands that take an argument to execute (ex: direction)
 var current_command = CommandType.NONE
 
 # Inventory
 var inventory = []
 var armor_item = null
-var weapon_item = Weapon.new("Dagger","Just a basic dagger","!",1)
+var weapon_item = Weapon.new("Dagger","Just a basic dagger",1)
 
 func _ready() -> void:
-	inventory.append(Item.new("Totem of debugging","Used to test if the inventory is functioning correctly","*"))
-	inventory.append(Weapon.new("Sword +1","Grants +1 to damage and hit","!",1))
-	inventory.append(Armor.new("Armor +1","Grants +1 to armor","O",1))
-
+	inventory.append(Item.new("Totem of debugging","Used to test if the inventory is functioning correctly"))
+	inventory.append(Weapon.new("Sword +1","Grants +1 to damage and hit",1))
+	inventory.append(Armor.new("Armor +1","Grants +1 to armor",1))
+	inventory.append(Potion.new())
 func _process(delta: float) -> void:
 	if action_delay_timer > 0.0:
 		action_delay_timer -= delta
@@ -48,6 +48,22 @@ func _process(delta: float) -> void:
 			var item = get_item_from_key()
 			if item != null:
 				drop_item.emit(item)
+		return
+	elif current_command == CommandType.USE_ITEM:
+		if Input.is_action_just_pressed("view_options"):
+			open_inventory.emit("- Select an item to use -")
+		else:	
+			var item = get_item_from_key()
+			if item != null:
+				if item.type == item.Type.USEABLE:
+					item.on_use(self)
+					inventory.erase(item)
+					log_message.emit("Used "+item.label)
+				else:
+					log_message.emit("Invalid item.")
+					current_command = CommandType.NONE
+				render_map.emit()
+		return
 		return
 	elif current_command == CommandType.WEAR_ARMOR:
 		if Input.is_action_just_pressed("view_options"):
@@ -151,13 +167,13 @@ func _process(delta: float) -> void:
 		elif Input.is_action_just_pressed("command_drop"):
 			current_command = CommandType.DROP
 			log_message.emit("Choose an item to drop (a-z). press (*) to view options")
-		elif Input.is_action_just_pressed("wear_armor"):
+		elif Input.is_action_just_pressed("command_wear_armor"):
 			current_command = CommandType.WEAR_ARMOR
 			log_message.emit("Choose an item to wear as armor (a-z). press (*) to view options")
-		elif Input.is_action_just_pressed("wield_weapon"):
+		elif Input.is_action_just_pressed("command_wield_weapon"):
 			current_command = CommandType.WIELD_WEAPON
 			log_message.emit("Choose an item to wield as a weapon (a-z). press (*) to view options")
-		elif Input.is_action_just_pressed("take_armor_off"):
+		elif Input.is_action_just_pressed("command_take_armor_off"):
 			if armor_item != null:
 				inventory.append(armor_item)
 				armor_item = null
@@ -167,7 +183,9 @@ func _process(delta: float) -> void:
 			else:
 				log_message.emit("No armor to take off.")
 			delay_actions(0.1)
-
+		elif Input.is_action_just_pressed("command_use_item"):
+			current_command = CommandType.USE_ITEM
+			log_message.emit("Choose an item to use (a-z). press (*) to view options")
 func delay_actions(delay: float):
 	action_delay_timer = delay
 

@@ -1,4 +1,4 @@
-extends Control
+extends Node
 
 @onready var stats_label = $StatsLabel
 
@@ -9,8 +9,8 @@ func set_stats_message(message):
 	stats_label.text = message
 
 func format_stats(stats):
-	var strength_bonus = ""
-	var armor_bonus = ""
+	var strength_bonus = "0"
+	var armor_bonus = "0"
 
 	if stats.bonus_strength > 0:
 		strength_bonus = "(+%d)" % stats.bonus_strength

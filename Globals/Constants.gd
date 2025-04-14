@@ -1,7 +1,7 @@
 extends Node
 
 # Constant variables
-const INVENTORY_CHARS = "abcefghijklmnopqrstuvxyz" # Chars to select an item in the inventory. some chars overlap with commands so remove those.
+const INVENTORY_CHARS = "abcefghijklmnoprstuvxyz" # Chars to select an item in the inventory. some chars overlap with commands so remove those.
 
 # ASCII characters
 const PLAYER = "@"
