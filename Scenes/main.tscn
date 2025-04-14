@@ -1,9 +1,10 @@
-[gd_scene load_steps=5 format=3 uid="uid://cv4l8fxqy3bof"]
+[gd_scene load_steps=6 format=3 uid="uid://cv4l8fxqy3bof"]
 
 [ext_resource type="Script" uid="uid://bkvy11motn7uh" path="res://Scripts/main.gd" id="1_iie3f"]
 [ext_resource type="Script" uid="uid://caphlodsvhhrj" path="res://Scripts/ui.gd" id="2_vud5e"]
 [ext_resource type="FontFile" uid="uid://bx2lyt3o5pdbd" path="res://RobotoMono-Medium.ttf" id="3_hncvb"]
 [ext_resource type="Script" uid="uid://3fxjowsrxau2" path="res://Scripts/player.gd" id="3_s7dad"]
+[ext_resource type="Script" uid="uid://d4cnboecwqpuu" path="res://Scripts/stats.gd" id="5_pbw6q"]
 
 [node name="Main" type="Node2D"]
 script = ExtResource("1_iie3f")
@@ -35,6 +36,9 @@ vertical_alignment = 3
 
 [node name="Player" type="Node2D" parent="."]
 script = ExtResource("3_s7dad")
+
+[node name="Stats" type="Node" parent="Player"]
+script = ExtResource("5_pbw6q")
 
 [node name="Camera2D" type="Camera2D" parent="."]
 position = Vector2(638, 362)

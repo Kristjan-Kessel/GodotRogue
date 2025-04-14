@@ -9,13 +9,13 @@ func set_stats_message(message):
 	stats_label.text = message
 
 func format_stats(stats):
-	var strength_bonus = "0"
-	var armor_bonus = "0"
+	var strength_bonus = ""
+	var armor_bonus = ""
 
-	if stats.bonus_strength > 0:
+	if stats.bonus_strength >= 1:
 		strength_bonus = "(+%d)" % stats.bonus_strength
 
-	if stats.bonus_armor > 0:
+	if stats.bonus_armor >= 1:
 		armor_bonus = "(+%d)" % stats.bonus_armor
 
 	return "Level:%d Hits:%d(%d) Str:%d%s Gold:%d Armor:%d%s exp:%d/%d" % [

@@ -20,7 +20,7 @@ const INITIAL_MOVE_DELAY = 0.3
 const REPEAT_RATE = 0.1
 var action_delay_timer = 0.0
 
-var stats = Stats.new(1,12,10,10,0)
+@onready var stats = $Stats
 
 # Commands
 enum CommandType {NONE, FIND, MOVE, INVENTORY, DROP, WEAR_ARMOR, WIELD_WEAPON, USE_ITEM} # For commands that take an argument to execute (ex: direction)
