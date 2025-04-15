@@ -1,10 +1,12 @@
 extends Item
 class_name Weapon
 
-var strength_bonus: int
+var bonus_attack: int
+var dice: int
 
-func _init(_label: String, _description: String, _strength_bonus: int):
+func _init(_label: String, _description: String, _bonus_attack: int, _dice: int):
 	label = _label
 	description = _description
-	strength_bonus = _strength_bonus
+	bonus_attack = _bonus_attack
 	type = Type.WEAPON
+	dice = _dice

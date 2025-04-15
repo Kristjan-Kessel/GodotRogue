@@ -4,30 +4,50 @@ var map_data : Array = []
 @onready var level = $UI/MapLabel
 @onready var player = $Player
 @onready var ui = $UI
+@onready var enemies = $Enemies
 
 var log_message = ""
+
+@export var turn = 0
 
 func _ready():
 	Globals.initialize_randomness()
 	print("Using seed: ", Globals.rng_seed)
-	ui.update_stats(player.stats)
-	new_level()
-	#test_level()
+	ui.update_stats(player, turn)
+	#new_level()
+	test_level()
 
 func get_tile(position: Vector2) -> Tile:
 	return map_data[position.y][position.x]
 
-func _process(delta: float) -> void:
-	pass
+var enemy_cache = {}
+
+func spawn_enemies(enemy_list):
+	for enemy_data in enemy_list:
+		var enemy_scene = enemy_cache.get(enemy_data.path)
+		if enemy_scene == null:
+			enemy_scene = load(enemy_data.path)
+			enemy_cache[enemy_data.path] = enemy_scene
+
+		var enemy = enemy_scene.instantiate()
+		enemy.position = enemy_data.position
+		enemies.add_child(enemy)
+
+		var tile = get_tile(enemy_data.position)
+		tile.entity = enemy
 
 func test_level():
 	var ascii_map = LevelGenerator.get_ascii_from_file("text.txt")
-	map_data = LevelGenerator.convert_ascii_to_tiles(ascii_map, player)
+	var level_data = LevelGenerator.convert_ascii_to_tiles(ascii_map, player)
+	map_data = level_data[0]
+	spawn_enemies(level_data[1])
 	render_map()
 
 func new_level():
 	var ascii_map = LevelGenerator.generate_level()
-	map_data = LevelGenerator.convert_ascii_to_tiles(ascii_map, player)
+	var level_data = LevelGenerator.convert_ascii_to_tiles(ascii_map, player)
+	map_data = level_data[0]
+	spawn_enemies(level_data[1])
 	render_map()
 
 func render_map():
@@ -67,23 +87,37 @@ func move_player(new_position: Vector2) -> bool:
 	var moved = false
 	
 	var target_tile = get_tile(new_position)
-	if target_tile.is_walkable and target_tile.entity == null:
-		get_tile(player.position).entity = null
-		player.position = new_position
-		target_tile.entity = player
-		moved = true
-		if target_tile.item != null:
-			var item = target_tile.item
-			item.on_pickup(player, target_tile)
-			log_message = "You picked up "+item.label
-			target_tile.item = null
-	
+	if target_tile.is_walkable:
+		if target_tile.entity == null:
+			get_tile(player.position).entity = null
+			player.position = new_position
+			target_tile.entity = player
+			moved = true
+			if target_tile.item != null:
+				var item = target_tile.item
+				item.on_pickup(player, target_tile)
+				log_message = "You picked up "+item.label
+				target_tile.item = null
+		else:
+			var entity = target_tile.entity
+			player.attack_enemy(entity)
+			return moved
 	on_action_taken();
 	return moved
-	
+
 func on_action_taken():
+	for enemy in enemies.get_children():
+		if enemy.health <= 0:
+			log_message = "You defeated the %s." % enemy.label
+			var tile = get_tile(enemy.position)
+			tile.entity = null
+			enemy.queue_free()
+		else:
+			enemy.on_turn()
+
 	render_map()
-	ui.update_stats(player.stats)
+	turn += 1
+	ui.update_stats(player, turn)
 
 func _on_player_log_message(new_message: Variant) -> void:
 	log_message = new_message
@@ -122,14 +156,13 @@ func _on_player_command_find(direction: Vector2) -> void:
 					break
 			else:
 				break
-		
 
 func _on_player_open_inventory(text: String) -> void:
 	render_inventory(text)
 
 func _on_player_render_map() -> void:
 	render_map()
-	ui.update_stats(player.stats)
+	ui.update_stats(player,turn)
 
 func _on_player_drop_item(item: Variant) -> void:
 	var tile = get_tile(player.position)

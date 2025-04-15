@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://yt005m1etlyu"]
+
+[ext_resource type="Script" uid="uid://bhmtrvsy2kp5q" path="res://Scripts/Enemies/training_dummy.gd" id="1_p2wxy"]
+
+[node name="TrainingDummy" type="Node2D"]
+script = ExtResource("1_p2wxy")

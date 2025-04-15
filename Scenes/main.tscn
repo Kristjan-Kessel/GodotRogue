@@ -9,6 +9,8 @@
 [node name="Main" type="Node2D"]
 script = ExtResource("1_iie3f")
 
+[node name="Enemies" type="Node" parent="."]
+
 [node name="UI" type="VBoxContainer" parent="."]
 anchors_preset = 5
 anchor_left = 0.5
@@ -39,6 +41,8 @@ script = ExtResource("3_s7dad")
 
 [node name="Stats" type="Node" parent="Player"]
 script = ExtResource("5_pbw6q")
+current_hp = 6
+strength = 14
 
 [node name="Camera2D" type="Camera2D" parent="."]
 position = Vector2(638, 362)

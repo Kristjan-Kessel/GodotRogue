@@ -7,5 +7,5 @@ func _init():
 	ascii = Constants.GOLD
 
 func on_pickup(player: Node, tile: Tile):
-	player.gold = player.gold+1
+	player.stats.gold = player.stats.gold+1
 	type = Type.GOLD

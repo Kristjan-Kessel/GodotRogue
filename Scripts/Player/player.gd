@@ -1,4 +1,4 @@
-extends Node
+extends Entity
 
 signal action_taken()
 signal player_move(new_position)
@@ -8,10 +8,7 @@ signal open_inventory(text)
 signal render_map()
 signal drop_item(item)
 
-var ascii = Constants.PLAYER
-
 # Movement variables
-var position : Vector2 = Vector2.ZERO
 var move_direction = Vector2.ZERO
 var is_moving = false
 var move_delay_timer = 0.0
@@ -23,17 +20,19 @@ var action_delay_timer = 0.0
 @onready var stats = $Stats
 
 # Commands
-enum CommandType {NONE, FIND, MOVE, INVENTORY, DROP, WEAR_ARMOR, WIELD_WEAPON, USE_ITEM} # For commands that take an argument to execute (ex: direction)
+enum CommandType {NONE, FIND, MOVE, INVENTORY, DROP, WEAR_ARMOR, WIELD_WEAPON, USE_ITEM, ATTACK} # For commands that take an argument to execute (ex: direction)
 var current_command = CommandType.NONE
 
 # Inventory
 var inventory = []
 var armor_item = null
-var weapon_item = Weapon.new("Dagger","Just a basic dagger",1)
+var weapon_item = Weapon.new("Dagger","Just a basic dagger",0,6)
 
 func _ready() -> void:
+	ascii = Constants.PLAYER
+	
 	inventory.append(Item.new("Totem of debugging","Used to test if the inventory is functioning correctly"))
-	inventory.append(Weapon.new("Sword +1","Grants +1 to damage and hit",1))
+	inventory.append(Weapon.new("Sword +1","Grants +1 to damage and hit",1,10))
 	inventory.append(Armor.new("Armor +1","Grants +1 to armor",1))
 	inventory.append(Potion.new())
 func _process(delta: float) -> void:
@@ -93,7 +92,6 @@ func _process(delta: float) -> void:
 					if weapon_item != null:
 						inventory.append(weapon_item)
 					weapon_item = item
-					stats.bonus_strength = weapon_item.strength_bonus
 					inventory.erase(item)
 					log_message.emit("Wielded "+item.label+" as a weapon.")
 				else:
@@ -151,7 +149,12 @@ func _process(delta: float) -> void:
 		if direction != Vector2.ZERO:
 			command_find.emit(direction)
 			clear_command()
-	
+	elif current_command == CommandType.ATTACK:
+		if Input.is_action_just_pressed("continue"):
+			current_command = CommandType.MOVE
+			log_message.emit("")
+			action_taken.emit()
+			return
 	if current_command == CommandType.NONE || current_command == CommandType.MOVE:
 		if Input.is_action_just_pressed("ui_up") || Input.is_action_just_pressed("ui_down") || Input.is_action_just_pressed("ui_left") || Input.is_action_just_pressed("ui_right"):  
 			current_command = CommandType.MOVE
@@ -196,6 +199,27 @@ func clear_command():
 func move_player():
 	if move_direction != Vector2.ZERO:
 		player_move.emit(position + move_direction)
+
+func attack_enemy(enemy: Enemy):
+	current_command = CommandType.ATTACK
+	var hit = Globals.rng.randi_range(1,20)
+	var crit = hit == 20
+	var hit_bonus = weapon_item.bonus_attack + stats.get_attack()
+	print("%d + %d" % [hit, hit_bonus])
+	hit += hit_bonus
+	
+	if hit>=enemy.armor || crit:
+		var damage = Globals.rng.randi_range(1,weapon_item.dice)
+		print("damage: %d + %d" % [damage, hit_bonus])
+		damage += hit_bonus
+		enemy.health -= damage
+		if crit:
+			damage += damage
+			log_message.emit("You scored an excellent hit on the %s. [continue]" % enemy.label)	
+		else:
+			log_message.emit("You scored a hit on the %s. [continue]" % enemy.label)	
+	else:
+		log_message.emit("You missed the %s. [continue]" % [enemy.label])
 
 func get_item_from_key() -> Item:
 	for c in Constants.INVENTORY_CHARS:

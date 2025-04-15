@@ -254,6 +254,7 @@ static func generate_room(map: Array, room: Rect2):
 
 static func convert_ascii_to_tiles(ascii_map: Array, player: Node) -> Array:
 	var tile_map = []
+	var enemies = []
 	for y in range(ascii_map.size()):
 		var row = []
 		for x in range(ascii_map[y].size()):
@@ -276,11 +277,15 @@ static func convert_ascii_to_tiles(ascii_map: Array, player: Node) -> Array:
 				Constants.GOLD:
 					tile = Tile.new("FLOOR",true,Constants.FLOOR,false)
 					tile.item = Gold.new()
+				"&":
+					tile = Tile.new("FLOOR",true,Constants.FLOOR,false)
+					var enemy = EnemyData.new(Vector2(x,y),"res://Scripts/Enemies/training_dummy.tscn")
+					enemies.append(enemy)
 				_:
 					tile = Tile.new("EMPTY", false,Constants.EMPTY, false)
 			row.append(tile)
 		tile_map.append(row)
-	return tile_map
+	return [tile_map,enemies]
 
 static func get_ascii_from_file(file_name: String) -> Array:
 	var path = "res://Test Levels/" + file_name
