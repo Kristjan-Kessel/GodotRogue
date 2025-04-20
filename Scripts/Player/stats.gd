@@ -1,5 +1,7 @@
 extends Node
 
+signal player_death
+
 @export var level: int = 1
 @export var max_hp: int = 12
 @export var current_hp: int = 12 : set = _set_current_hp
@@ -21,6 +23,8 @@ func _set_current_exp(new_exp):
 
 func _set_current_hp(new_hp):
 	current_hp = clamp(new_hp,0,max_hp)
+	if current_hp == 0:
+		player_death.emit()
 
 func get_total_armor():
 	return armor+bonus_armor

@@ -20,7 +20,7 @@ var action_delay_timer = 0.0
 @onready var stats = $Stats
 
 # Commands
-enum CommandType {NONE, FIND, MOVE, INVENTORY, DROP, WEAR_ARMOR, WIELD_WEAPON, USE_ITEM, ATTACK} # For commands that take an argument to execute (ex: direction)
+enum CommandType {DEATH, NONE, FIND, MOVE, INVENTORY, DROP, WEAR_ARMOR, WIELD_WEAPON, USE_ITEM, ATTACK} # For commands that take an argument to execute (ex: direction)
 var current_command = CommandType.NONE
 
 # Inventory
@@ -234,3 +234,6 @@ func get_item_from_key() -> Item:
 			else:
 				log_message.emit("Invalid item.")
 	return null
+
+func _on_stats_player_death() -> void:
+	current_command = CommandType.DEATH

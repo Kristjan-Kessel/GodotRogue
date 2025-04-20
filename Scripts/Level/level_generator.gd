@@ -262,28 +262,28 @@ static func convert_ascii_to_tiles(ascii_map: Array, player: Node) -> Array:
 			var tile = null
 			match ascii_map[y][x]:
 				Constants.WALL:
-					tile = Tile.new("WALL", false, Constants.WALL,false, id)
+					tile = Tile.new("WALL", false, Constants.WALL, false, id, Vector2(x,y))
 				Constants.CEILING:
-					tile = Tile.new("WALL", false, Constants.CEILING,false, id)
+					tile = Tile.new("WALL", false, Constants.CEILING,false, id, Vector2(x,y))
 				Constants.FLOOR:
-					tile = Tile.new("FLOOR", true, Constants.FLOOR,false, id)
+					tile = Tile.new("FLOOR", true, Constants.FLOOR,false, id, Vector2(x,y))
 				Constants.DOOR:
-					tile = Tile.new("DOOR", true, Constants.DOOR,true, id)
+					tile = Tile.new("DOOR", true, Constants.DOOR,true, id, Vector2(x,y))
 				Constants.CORRIDOR:
-					tile = Tile.new("CORRIDOR",true,Constants.CORRIDOR,false, id)
+					tile = Tile.new("CORRIDOR",true,Constants.CORRIDOR,false, id, Vector2(x,y))
 				Constants.PLAYER:
-					tile = Tile.new("FLOOR",true,Constants.FLOOR,false, id)
+					tile = Tile.new("FLOOR",true,Constants.FLOOR,false, id, Vector2(x,y))
 					player.position = Vector2(x,y);
 					tile.entity = player
 				Constants.GOLD:
-					tile = Tile.new("FLOOR",true,Constants.FLOOR,false, id)
+					tile = Tile.new("FLOOR",true,Constants.FLOOR,false, id, Vector2(x,y))
 					tile.item = Gold.new()
 				"&":
-					tile = Tile.new("FLOOR",true,Constants.FLOOR,false, id)
+					tile = Tile.new("FLOOR",true,Constants.FLOOR,false, id, Vector2(x,y))
 					var enemy = EnemyData.new(Vector2(x,y),"res://Scripts/Enemies/goblin.tscn")
 					enemies.append(enemy)
 				_:
-					tile = Tile.new("EMPTY", false,Constants.EMPTY, false, id)
+					tile = Tile.new("EMPTY", false,Constants.EMPTY, false, id, Vector2(x,y))
 			row.append(tile)
 			id += 1
 		tile_map.append(row)

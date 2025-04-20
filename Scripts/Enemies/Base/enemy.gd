@@ -9,6 +9,7 @@ signal enemy_move(new_position)
 @export var dice: int
 enum State {IDLE,ATTACKING}
 var state = ""
+var is_visible = true
 
 func on_turn(astar: AStar2D, tile: Tile, player_tile: Tile):
 	# check if see player, turn to attacking stance!
@@ -23,6 +24,8 @@ func attack_player(player: Node) -> String:
 	print("hit: %d+%d" % [hit, hit_bonus])
 	hit += hit_bonus
 	
+	var result = ""
+	
 	if hit>=player.stats.armor || crit:
 		var damage = Globals.rng.randi_range(1,dice)
 		print("dmg: %d+%d" % [damage,hit_bonus])
@@ -30,8 +33,11 @@ func attack_player(player: Node) -> String:
 		player.stats.current_hp -= damage
 		if crit:
 			damage += damage
-			return "The %s has injured you." % label
+			result = "The %s has injured you." % label
 		else:
-			return "The %s has greatly injured you." % label
+			result = "The %s has greatly injured you." % label
+		if player.stats.current_hp == 0:
+			result = "The %s has killed you." % label
 	else:
-		return "The %s misses you." % label
+		result = "The %s misses you." % label
+	return result
