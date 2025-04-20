@@ -255,35 +255,37 @@ static func generate_room(map: Array, room: Rect2):
 static func convert_ascii_to_tiles(ascii_map: Array, player: Node) -> Array:
 	var tile_map = []
 	var enemies = []
+	var id = 0
 	for y in range(ascii_map.size()):
 		var row = []
 		for x in range(ascii_map[y].size()):
 			var tile = null
 			match ascii_map[y][x]:
 				Constants.WALL:
-					tile = Tile.new("WALL", false, Constants.WALL,false)
+					tile = Tile.new("WALL", false, Constants.WALL,false, id)
 				Constants.CEILING:
-					tile = Tile.new("WALL", false, Constants.CEILING,false)
+					tile = Tile.new("WALL", false, Constants.CEILING,false, id)
 				Constants.FLOOR:
-					tile = Tile.new("FLOOR", true, Constants.FLOOR,false)
+					tile = Tile.new("FLOOR", true, Constants.FLOOR,false, id)
 				Constants.DOOR:
-					tile = Tile.new("DOOR", true, Constants.DOOR,true)
+					tile = Tile.new("DOOR", true, Constants.DOOR,true, id)
 				Constants.CORRIDOR:
-					tile = Tile.new("CORRIDOR",true,Constants.CORRIDOR,false)
+					tile = Tile.new("CORRIDOR",true,Constants.CORRIDOR,false, id)
 				Constants.PLAYER:
-					tile = Tile.new("FLOOR",true,Constants.FLOOR,false)
+					tile = Tile.new("FLOOR",true,Constants.FLOOR,false, id)
 					player.position = Vector2(x,y);
 					tile.entity = player
 				Constants.GOLD:
-					tile = Tile.new("FLOOR",true,Constants.FLOOR,false)
+					tile = Tile.new("FLOOR",true,Constants.FLOOR,false, id)
 					tile.item = Gold.new()
 				"&":
-					tile = Tile.new("FLOOR",true,Constants.FLOOR,false)
-					var enemy = EnemyData.new(Vector2(x,y),"res://Scripts/Enemies/training_dummy.tscn")
+					tile = Tile.new("FLOOR",true,Constants.FLOOR,false, id)
+					var enemy = EnemyData.new(Vector2(x,y),"res://Scripts/Enemies/goblin.tscn")
 					enemies.append(enemy)
 				_:
-					tile = Tile.new("EMPTY", false,Constants.EMPTY, false)
+					tile = Tile.new("EMPTY", false,Constants.EMPTY, false, id)
 			row.append(tile)
+			id += 1
 		tile_map.append(row)
 	return [tile_map,enemies]
 

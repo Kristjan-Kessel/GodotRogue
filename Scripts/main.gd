@@ -8,6 +8,8 @@ var map_data : Array = []
 
 var log_message = ""
 
+var astar = AStar2D.new()
+
 @export var turn = 0
 
 func _ready():
@@ -18,11 +20,29 @@ func _ready():
 	test_level()
 
 func get_tile(position: Vector2) -> Tile:
-	return map_data[position.y][position.x]
+	if position.y >= 0 and position.y < map_data.size() and position.x >= 0 and position.x < map_data[0].size():
+		return map_data[position.y][position.x]
+	return null
 
 var enemy_cache = {}
 
-func spawn_enemies(enemy_list):
+func update_astar():
+	for y in range(map_data.size()):
+		for x in range(map_data[y].size()):
+			var tile = map_data[y][x]
+			if tile.is_walkable and (tile.entity == null or tile.entity == player):
+				connect_tile(tile, Vector2(x,y))
+
+func connect_tile(tile, position):
+	astar.add_point(tile.id, position)
+	for offset in [Vector2.LEFT, Vector2.RIGHT, Vector2.UP, Vector2.DOWN]:
+		var nx = position.x + offset.x
+		var ny = position.y + offset.y
+		var ntile = get_tile(Vector2(nx,ny))
+		if ntile != null && ntile.is_walkable && astar.has_point(ntile.id):
+			astar.connect_points(tile.id, ntile.id)
+
+func spawn_enemies_from_list(enemy_list):
 	for enemy_data in enemy_list:
 		var enemy_scene = enemy_cache.get(enemy_data.path)
 		if enemy_scene == null:
@@ -35,20 +55,23 @@ func spawn_enemies(enemy_list):
 
 		var tile = get_tile(enemy_data.position)
 		tile.entity = enemy
+		enemy.enemy_move.connect(move_enemy)
 
 func test_level():
 	var ascii_map = LevelGenerator.get_ascii_from_file("text.txt")
 	var level_data = LevelGenerator.convert_ascii_to_tiles(ascii_map, player)
 	map_data = level_data[0]
-	spawn_enemies(level_data[1])
+	spawn_enemies_from_list(level_data[1])
 	render_map()
+	update_astar()
 
 func new_level():
 	var ascii_map = LevelGenerator.generate_level()
 	var level_data = LevelGenerator.convert_ascii_to_tiles(ascii_map, player)
 	map_data = level_data[0]
-	spawn_enemies(level_data[1])
+	spawn_enemies_from_list(level_data[1])
 	render_map()
+	update_astar()
 
 func render_map():
 	var map_str = log_message+"\n"
@@ -79,6 +102,21 @@ func render_inventory(text: String):
 func _on_player_move(new_position: Vector2) -> void:
 	move_player(new_position)
 
+func move_enemy(new_position: Vector2, enemy: Enemy):
+	new_position.x = clamp(new_position.x, 0, Globals.map_width - 1)
+	new_position.y = clamp(new_position.y, 0, Globals.map_height - 1)
+	
+	var target_tile = get_tile(new_position)
+	if target_tile.is_walkable:
+		if target_tile.entity == null:
+			get_tile(enemy.position).entity = null
+			enemy.position = new_position
+			target_tile.entity = enemy
+		elif target_tile.entity == player:
+			log_message = enemy.attack_player(player)
+			render_map()
+	astar.remove_point(get_tile(enemy.position).id)
+
 func move_player(new_position: Vector2) -> bool:
 	log_message = ""
 	
@@ -107,13 +145,14 @@ func move_player(new_position: Vector2) -> bool:
 
 func on_action_taken():
 	for enemy in enemies.get_children():
+		var tile = get_tile(enemy.position)
 		if enemy.health <= 0:
 			log_message = "You defeated the %s." % enemy.label
-			var tile = get_tile(enemy.position)
 			tile.entity = null
 			enemy.queue_free()
 		else:
-			enemy.on_turn()
+			connect_tile(tile,enemy.position)
+			enemy.on_turn(astar, get_tile(player.position), tile)
 
 	render_map()
 	turn += 1
