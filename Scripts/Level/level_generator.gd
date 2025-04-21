@@ -292,12 +292,15 @@ static func convert_ascii_to_tiles(ascii_map: Array, player: Node) -> Array:
 static func get_ascii_from_file(file_name: String) -> Array:
 	var path = "res://Test Levels/" + file_name
 	var result = []
-	
+	var longest = 0
 	if FileAccess.file_exists(path):
 		var file = FileAccess.open(path, FileAccess.READ)
 		while !file.eof_reached():
 			var line = file.get_line()
 			var char_array = line.split("", false)
+			if line.length() > longest:
+				longest = line.length()
+			line.rpad(longest, " ")
 			result.append(char_array)
 		file.close()
 	else:

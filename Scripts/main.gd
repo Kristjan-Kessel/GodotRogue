@@ -16,12 +16,14 @@ func _ready():
 	Globals.initialize_randomness()
 	print("Using seed: ", Globals.rng_seed)
 	ui.update_stats(player, turn)
-	new_level()
-	#test_level()
+	#new_level()
+	test_level()
 
 func get_tile(position: Vector2) -> Tile:
-	if position.y >= 0 and position.y < map_data.size() and position.x >= 0 and position.x < map_data[0].size():
-		return map_data[position.y][position.x]
+	if position.y >= 0 and position.y < map_data.size():
+		var row = map_data[position.y]
+		if position.x >= 0 and position.x < row.size():
+			return map_data[position.y][position.x]
 	return null
 
 func get_tile_neighbours(tile: Tile) -> Array:
@@ -279,3 +281,10 @@ func _on_player_drop_item(item: Variant) -> void:
 
 func _on_stats_player_death() -> void:
 	pass
+
+func _on_player_open_help_menu() -> void:
+	var file = FileAccess.open("res://Assets/help.txt", FileAccess.READ)
+	if file:
+		var text = file.get_as_text()
+		ui.set_stats_message("- Press space to continue -")
+		level.text = text

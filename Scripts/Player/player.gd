@@ -7,6 +7,7 @@ signal command_find(direction)
 signal open_inventory(text)
 signal render_map()
 signal drop_item(item)
+signal open_help_menu()
 
 # Movement variables
 var move_direction = Vector2.ZERO
@@ -20,7 +21,7 @@ var action_delay_timer = 0.0
 @onready var stats = $Stats
 
 # Commands
-enum CommandType {DEATH, NONE, FIND, MOVE, INVENTORY, DROP, WEAR_ARMOR, WIELD_WEAPON, USE_ITEM, ATTACK} # For commands that take an argument to execute (ex: direction)
+enum CommandType {DEATH, NONE, FIND, MOVE, INVENTORY, HELP, DROP, WEAR_ARMOR, WIELD_WEAPON, USE_ITEM, ATTACK} # For commands that take an argument to execute (ex: direction)
 var current_command = CommandType.NONE
 
 # Inventory
@@ -100,6 +101,10 @@ func _process(delta: float) -> void:
 					render_map.emit()
 			return
 		CommandType.INVENTORY:
+			if Input.is_action_just_pressed("continue"):
+				current_command = CommandType.NONE
+				render_map.emit()
+		CommandType.HELP:
 			if Input.is_action_just_pressed("continue"):
 				current_command = CommandType.NONE
 				render_map.emit()
@@ -189,6 +194,10 @@ func _process(delta: float) -> void:
 		elif Input.is_action_just_pressed("command_use_item"):
 			current_command = CommandType.USE_ITEM
 			log_message.emit("Choose an item to use (a-z). press (*) to view options")
+		elif Input.is_action_just_pressed("command_help"):
+			current_command = CommandType.HELP
+			open_help_menu.emit()
+
 func delay_actions(delay: float):
 	action_delay_timer = delay
 
