@@ -3,21 +3,27 @@ class_name Enemy
 
 signal enemy_move(new_position)
 
-@export var health: int
+@export var health: int : set = _set_health
 @export var armor: int
 @export var attack: int
+@export var exp: int
 enum State {SLEEPING,IDLE,ATTACKING}
-var state = State.ATTACKING
+var state = State.IDLE
 var is_visible = true
+var can_see_player = false
 
-func on_turn(astar: AStar2D, tile: Tile, player_tile: Tile):
+func on_turn(path: Array):
 	if state == State.IDLE:
-		#if see player then start attacking
-		if true:
+		if can_see_player:
 			state = State.ATTACKING
 	if state == State.ATTACKING:
-		var path = astar.get_point_path(player_tile.id, tile.id)
-		enemy_move.emit(path[1], self)
+		if path.size() > 0:
+			enemy_move.emit(path[1], self)
+
+func _set_health(hp: int):
+	health = hp
+	if state == State.SLEEPING:
+		state = State.ATTACKING
 
 func attack_player(player: Node) -> String:
 	var hit = Globals.rng.randi_range(0,attack)

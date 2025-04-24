@@ -60,6 +60,8 @@ func spawn_enemies_from_list(enemy_list):
 		var enemy = enemy_scene.instantiate()
 		enemy.position = enemy_data.position
 		enemies.add_child(enemy)
+		if enemy_data.is_sleeping:
+			enemy.state = Enemy.State.SLEEPING
 
 		var tile = get_tile(enemy_data.position)
 		tile.entity = enemy
@@ -75,18 +77,20 @@ func test_level():
 	render_map()
 
 func new_level():
-	var ascii_map = LevelGenerator.generate_level(player)
-	var level_data = LevelGenerator.convert_ascii_to_tiles(ascii_map, player)
+	var level_data = LevelGenerator.generate_level(player)
 	map_data = level_data[0]
 	spawn_enemies_from_list(level_data[1])
 	update_astar()
-	reveal_room(get_tile(player.position))
+	#reveal_room(get_tile(player.position))
 	render_map()
 
 func render_map():
-	# check for line of sight
 	var ptile = get_tile(player.position)
 	var max_distance = 99
+	
+	var debug_sight = true
+	
+	# Checks for line of sight with enemies
 	for enemy in enemies.get_children():
 		var is_visible = true
 		var etile = get_tile(enemy.position)
@@ -100,18 +104,18 @@ func render_map():
 				is_visible = false
 				break
 			if tile.type == "CORRIDOR":
-				max_distance = 2
+				max_distance = 1
 			if distance > max_distance:
 				is_visible = false
 				break
-		enemy.is_visible = is_visible
+		enemy.is_visible = is_visible || debug_sight
 		astar.remove_point(etile.id)
 		
 	var map_str = log_message+"\n"
 	for y in range(map_data.size()):
 		for x in range(map_data[y].size()):
 			var tile = map_data[y][x]
-			if true: #tile.discovered:
+			if tile.discovered || debug_sight:
 				if tile.entity != null && (tile.entity == player || tile.entity.is_visible):
 					map_str += tile.entity.ascii
 				elif tile.item != null:
@@ -138,7 +142,7 @@ func reveal_room(start_tile: Tile):
 		current_tile.discovered = true
 
 		for ntile in get_tile_neighbours(current_tile):
-			if ntile.type in ["WALL", "FLOOR", "DOOR", "CEILING"]:
+			if ntile.type in ["WALL", "FLOOR", "DOOR"]:
 				queue.append(ntile)
 
 func render_inventory(text: String):
@@ -155,7 +159,6 @@ func render_inventory(text: String):
 func move_enemy(new_position: Vector2, enemy: Enemy):
 	new_position.x = clamp(new_position.x, 0, Globals.map_width - 1)
 	new_position.y = clamp(new_position.y, 0, Globals.map_height - 1)
-	
 	var target_tile = get_tile(new_position)
 	if target_tile.is_walkable:
 		if target_tile.entity == null:
@@ -177,7 +180,7 @@ func move_player(new_position: Vector2) -> bool:
 	var moved = false
 	
 	var target_tile = get_tile(new_position)
-	if target_tile.is_walkable:
+	if target_tile != null && target_tile.is_walkable:
 		if target_tile.entity == null:
 			get_tile(player.position).entity = null
 			player.position = new_position
@@ -205,16 +208,29 @@ func move_player(new_position: Vector2) -> bool:
 	return moved
 
 func on_action_taken():
+	var player_tile = get_tile(player.position)
+	connect_tile(player_tile)
 	for enemy in enemies.get_children():
 		var tile = get_tile(enemy.position)
 		if enemy.health <= 0:
 			log_message = "You defeated the %s." % enemy.label
 			tile.entity = null
+			player.stats.exp += enemy.exp
 			enemy.queue_free()
+			connect_tile(tile)
 		else:
 			connect_tile(tile)
-			enemy.on_turn(astar, get_tile(player.position), tile)
-
+			# Check for line of sight with player
+			var path = astar.get_point_path(tile.id, player_tile.id)
+			var is_visible = true
+			for point in path:
+				var ptile = get_tile(point)
+				if ptile.type == "DOOR" && ptile.entity != player:
+					is_visible = false
+					break
+			enemy.can_see_player = is_visible
+			enemy.on_turn(path)
+	
 	render_map()
 	turn += 1
 	ui.update_stats(player, turn)
@@ -303,3 +319,12 @@ func _on_player_open_help_menu() -> void:
 		var text = file.get_as_text()
 		ui.set_stats_message("- Press space to continue -")
 		level.text = text
+
+
+func _on_player_use_stairs() -> void:
+	var tile = get_tile(player.position)
+	if tile.type == "STAIRS":
+		player.stats.level += 1
+		new_level()
+		ui.update_stats(player,turn)
+		render_map()

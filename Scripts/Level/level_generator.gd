@@ -12,6 +12,7 @@ const room_chance = 20
 const max_missing_rooms = 3
 
 static func generate_level(player: Node) -> Array:
+	var empty_tile = Tile.new("EMPTY", false, Constants.EMPTY, false, Vector2(-1,-1))
 	var map = []
 	var room_grid = [[null,null,null],[null,null,null],[null,null,null]]
 	var room_list = []
@@ -19,7 +20,7 @@ static func generate_level(player: Node) -> Array:
 	for y in range(Globals.map_height):
 		var row = []
 		for x in range(Globals.map_width):
-			row.append(Constants.EMPTY);
+			row.append(empty_tile);
 		map.append(row)
 	
 	var loop_count = 0
@@ -71,12 +72,16 @@ static func generate_level(player: Node) -> Array:
 		
 		if !room.skip:
 			generate_room(map,room)
-		
-		if room.is_player_room:
-			map[start_y+room.size.y/2][start_x+room.size.x/2] = Constants.PLAYER
-		
-		if room.is_exit_room:
-			map[start_y+room.size.y/2][start_x+room.size.x/2] = Constants.STAIRS
+			
+			var center_tile = room.get_center_tile()
+			if room.is_exit_room:
+				center_tile.type = "STAIRS"
+				center_tile.is_important = true
+				center_tile.ascii = Constants.STAIRS
+
+			if room.is_player_room:
+				center_tile.entity = player
+				player.position = center_tile.position
 		
 		room_grid[room.grid_position.y][room.grid_position.x] = room
 		loop_count+=1
@@ -84,9 +89,9 @@ static func generate_level(player: Node) -> Array:
 	select_and_generate_corridors(map,room_grid,room_list)
 	
 	# Spawn enemies and items
+	var enemies = []
 	
-	
-	return map
+	return [map, room_list, enemies]
 
 static func select_and_generate_corridors(map: Array, room_grid: Array, room_list: Array):
 	var orphan_rooms = Array(room_list)
@@ -150,7 +155,6 @@ static func generate_corridor_between_rooms(map: Array, rooms: Array, start_room
 	
 	#draw_corridor_randomly(start,end,map,is_horizontal)
 	draw_corridor_shaped(start,end,map,is_horizontal)
-
 
 static func draw_corridor_shaped(start: Vector2, end: Vector2, map: Array, is_horizontal:bool):
 	var cursor = start
@@ -251,24 +255,34 @@ static func draw_corridor_randomly(start: Vector2, end: Vector2, map: Array, is_
 			else:
 				cursor.y += direction.y
 
-static func carve_corridor_cell(cursor: Vector2, map: Array):
-	if map[cursor.y][cursor.x] == Constants.WALL || map[cursor.y][cursor.x] == Constants.CEILING:
-		map[cursor.y][cursor.x] = Constants.DOOR
+static func carve_corridor_cell(position: Vector2, map: Array):
+	
+	var current_tile = map[position.y][position.x]
+	if current_tile.type == "WALL":
+		map[position.y][position.x] = Tile.new("DOOR", true, Constants.DOOR, true, position)
 	else:
-		map[cursor.y][cursor.x] = Constants.CORRIDOR
+		map[position.y][position.x] = Tile.new("CORRIDOR", true, Constants.CORRIDOR, false, position)
 
 static func generate_room(map: Array, room: Room):
+	var tile_grid = []
 	for y in range(room.size.y):
+		var row = []
 		for x in range(room.size.x):
-			if(y == 0 || y==room.size.y-1):
-				map[room.position.y+y][room.position.x+x] = Constants.CEILING
-			elif(x == 0 || x==room.size.x-1):
-				map[room.position.y+y][room.position.x+x] = Constants.WALL
+			var position = Vector2(room.position.x+x,room.position.y+y)
+			var tile
+			if y == 0 || y==room.size.y-1:
+				tile = Tile.new("WALL", false, Constants.CEILING, false, position)
+			elif x == 0 || x==room.size.x-1:
+				tile = Tile.new("WALL", false, Constants.WALL, false, position)
 			else:
-				map[room.position.y+y][room.position.x+x] = Constants.FLOOR
+				tile = Tile.new("FLOOR", true, Constants.FLOOR, false, position)
+			map[position.y][position.x] = tile 
+			row.append(tile)
+		tile_grid.append(row)
+	room.tile_grid = tile_grid
 
 static func get_ascii_from_file(file_name: String) -> Array:
-	var path = "res://Test Levels/" + file_name
+	var path = "res://Preset Levels/" + file_name
 	var result = []
 	var longest = 0
 	if FileAccess.file_exists(path):
@@ -295,30 +309,30 @@ static func convert_ascii_to_tiles(ascii_map: Array, player: Node) -> Array:
 			var tile = null
 			match ascii_map[y][x]:
 				Constants.WALL:
-					tile = Tile.new("WALL", false, Constants.WALL, false, id, Vector2(x,y))
+					tile = Tile.new("WALL", false, Constants.WALL, false, Vector2(x,y))
 				Constants.CEILING:
-					tile = Tile.new("WALL", false, Constants.CEILING,false, id, Vector2(x,y))
+					tile = Tile.new("WALL", false, Constants.CEILING,false, Vector2(x,y))
 				Constants.FLOOR:
-					tile = Tile.new("FLOOR", true, Constants.FLOOR,false, id, Vector2(x,y))
+					tile = Tile.new("FLOOR", true, Constants.FLOOR,false, Vector2(x,y))
 				Constants.DOOR:
-					tile = Tile.new("DOOR", true, Constants.DOOR,true, id, Vector2(x,y))
+					tile = Tile.new("DOOR", true, Constants.DOOR,true, Vector2(x,y))
 				Constants.CORRIDOR:
-					tile = Tile.new("CORRIDOR",true,Constants.CORRIDOR,false, id, Vector2(x,y))
+					tile = Tile.new("CORRIDOR",true,Constants.CORRIDOR,false, Vector2(x,y))
 				Constants.PLAYER:
-					tile = Tile.new("FLOOR",true,Constants.FLOOR,false, id, Vector2(x,y))
+					tile = Tile.new("FLOOR",true,Constants.FLOOR,false, Vector2(x,y))
 					player.position = Vector2(x,y);
 					tile.entity = player
 				Constants.GOLD:
-					tile = Tile.new("FLOOR",true,Constants.FLOOR, false, id, Vector2(x,y))
+					tile = Tile.new("FLOOR",true,Constants.FLOOR, false, Vector2(x,y))
 					tile.item = Gold.new()
 				Constants.STAIRS:
-					tile = Tile.new("STAIRS",true,Constants.STAIRS, false, id, Vector2(x,y))
+					tile = Tile.new("STAIRS",true,Constants.STAIRS, false, Vector2(x,y))
 				"&":
-					tile = Tile.new("FLOOR",true,Constants.FLOOR,false, id, Vector2(x,y))
-					var enemy = EnemyData.new(Vector2(x,y),"res://Scripts/Enemies/goblin.tscn")
+					tile = Tile.new("FLOOR",true,Constants.FLOOR,false, Vector2(x,y))
+					var enemy = EnemyData.new(Vector2(x,y),"res://Scripts/Enemies/goblin.tscn", true)
 					enemies.append(enemy)
 				_:
-					tile = Tile.new("EMPTY", false,Constants.EMPTY, false, id, Vector2(x,y))
+					tile = Tile.new("EMPTY", false,Constants.EMPTY, false, Vector2(x,y))
 			row.append(tile)
 			id += 1
 		tile_map.append(row)

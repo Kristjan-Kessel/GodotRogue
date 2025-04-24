@@ -8,6 +8,7 @@ signal open_inventory(text)
 signal render_map()
 signal drop_item(item)
 signal open_help_menu()
+signal use_stairs()
 
 # Movement variables
 var move_direction = Vector2.ZERO
@@ -36,6 +37,7 @@ func _ready() -> void:
 	inventory.append(Weapon.new("Sword +1","Grants +1 to damage and hit",1,10))
 	inventory.append(Armor.new("Armor +1","Grants +1 to armor",1))
 	inventory.append(Potion.new())
+	inventory.append(StrengthPotion.new())
 func _process(delta: float) -> void:
 	if action_delay_timer > 0.0:
 		action_delay_timer -= delta
@@ -197,6 +199,9 @@ func _process(delta: float) -> void:
 		elif Input.is_action_just_pressed("command_help"):
 			current_command = CommandType.HELP
 			open_help_menu.emit()
+		elif Input.is_action_just_pressed("command_stairs"):
+			use_stairs.emit()
+			delay_actions(0.1)
 
 func delay_actions(delay: float):
 	action_delay_timer = delay

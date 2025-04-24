@@ -6,3 +6,4 @@ func _ready() -> void:
 	attack = 10
 	label = "Goblin"
 	ascii = "g"
+	exp = 1

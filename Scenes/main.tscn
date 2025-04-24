@@ -55,5 +55,6 @@ position = Vector2(638, 362)
 [connection signal="open_inventory" from="Player" to="." method="_on_player_open_inventory"]
 [connection signal="player_move" from="Player" to="." method="_on_player_move"]
 [connection signal="render_map" from="Player" to="." method="_on_player_render_map"]
+[connection signal="use_stairs" from="Player" to="." method="_on_player_use_stairs"]
 [connection signal="player_death" from="Player/Stats" to="." method="_on_stats_player_death"]
 [connection signal="player_death" from="Player/Stats" to="Player" method="_on_stats_player_death"]
