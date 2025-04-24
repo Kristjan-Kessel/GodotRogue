@@ -214,12 +214,10 @@ func attack_enemy(enemy: Enemy):
 	var hit = Globals.rng.randi_range(1,20)
 	var crit = hit == 20
 	var hit_bonus = weapon_item.bonus_attack + stats.get_attack()
-	print("%d + %d" % [hit, hit_bonus])
 	hit += hit_bonus
 	
 	if hit>=enemy.armor || crit:
 		var damage = Globals.rng.randi_range(1,weapon_item.dice)
-		print("damage: %d + %d" % [damage, hit_bonus])
 		damage += hit_bonus
 		enemy.health -= damage
 		if crit:

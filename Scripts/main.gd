@@ -75,7 +75,7 @@ func test_level():
 	render_map()
 
 func new_level():
-	var ascii_map = LevelGenerator.generate_level()
+	var ascii_map = LevelGenerator.generate_level(player)
 	var level_data = LevelGenerator.convert_ascii_to_tiles(ascii_map, player)
 	map_data = level_data[0]
 	spawn_enemies_from_list(level_data[1])
@@ -239,8 +239,7 @@ func _on_player_command_find(direction: Vector2) -> void:
 		var left_tile = get_tile(player.position + left_direction)
 		var right_tile = get_tile(player.position + right_direction)
 		
-		
-		
+		# Makes it so the player always starts moving
 		if !bypass_important:
 			if left_tile != null && left_tile.is_interesting():
 				break
@@ -253,6 +252,7 @@ func _on_player_command_find(direction: Vector2) -> void:
 		last_tile = get_tile(player.position)
 		var moved = move_player(new_position)
 		
+		# Check if player is at a corridor intersection
 		if next_tile.type == "CORRIDOR":
 			var walkable_directions = 0
 			for ntile in get_tile_neighbours(next_tile):
@@ -261,6 +261,7 @@ func _on_player_command_find(direction: Vector2) -> void:
 			if walkable_directions > 1:
 				break
 		
+		# Makes the player continue through corridor turns
 		if !moved:
 			if get_tile(player.position).type == "CORRIDOR":
 				if left_tile.is_walkable:
