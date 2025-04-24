@@ -8,8 +8,8 @@ const min_room_offset_x = 1
 const min_room_offset_y = 1
 
 #how likely it is for any given room to not existing, 1/room_chance
-const room_chance = 10
-const max_missing_rooms = 1
+const room_chance = 20
+const max_missing_rooms = 3
 
 
 static func generate_level() -> Array:
@@ -23,48 +23,65 @@ static func generate_level() -> Array:
 			row.append(Constants.EMPTY);
 		map.append(row)
 	
+	# list of rooms
+	# if chance work then remove one random room that not importante
+	# select randomly room for player spawn, select room for exit spawn
+	
 	var loop_count = 0
 	var player_room = Globals.level_rng.randi_range(0,8)
 	var exit_room = Globals.level_rng.randi_range(0,8)
 	var missing_room_count = 0
+	
+	var potential_rooms = []
+	var valid_rooms = []
 	for y in range(3):
 		for x in range(3):
-			var is_spawn_room = loop_count == player_room
-			var is_exit_room = loop_count == exit_room
-			var skip_room = Globals.level_rng.randi_range(1,room_chance) == 1 && !is_spawn_room && !is_exit_room && missing_room_count < max_missing_rooms
+			var room = PotentialRoom.new(x,y)
+			potential_rooms.append(room)
+			valid_rooms.append(room)
+	
+	for i in range(max_missing_rooms):
+		if Globals.level_rng.randi_range(1,room_chance):
+			var room = valid_rooms[Globals.level_rng.randi_range(0,valid_rooms.size()-1)]
+			room.skip = true
+			valid_rooms.erase(room)
+
+	valid_rooms[Globals.level_rng.randi_range(0,valid_rooms.size()-1)].is_player_room = true
+	valid_rooms[Globals.level_rng.randi_range(0,valid_rooms.size()-1)].is_exit_room = true
+	
+	for proom in potential_rooms:
+		var max_width = Globals.map_width/3
+		var max_height = Globals.map_height/3
+		var start_x = Globals.map_width/3*proom.x
+		var start_y = Globals.map_height/3*proom.y
+		
+		var room
+		
+		if proom.skip:
+			room = Rect2(Globals.level_rng.randi_range(start_x,start_x+max_width-1),Globals.level_rng.randi_range(start_y,start_y+max_height-1),1,1)
+			missing_room_count += 1
+		else:
+			var x_offset = Globals.level_rng.randi_range(min_room_offset_x,max_width-min_room_width)
+			var y_offset = Globals.level_rng.randi_range(min_room_offset_y,max_height-min_room_height)
+		
+			start_x += x_offset
+			start_y += y_offset
+			max_width -= x_offset
+			max_height -= y_offset
 			
-			var max_width = Globals.map_width/3
-			var max_height = Globals.map_height/3
-			var start_x = Globals.map_width/3*x
-			var start_y = Globals.map_height/3*y
+			var width = Globals.level_rng.randi_range(min_room_width,max_width)
+			var height = Globals.level_rng.randi_range(min_room_height,max_height)
 			
-			var room
-			
-			if skip_room:
-				room = Rect2(Globals.level_rng.randi_range(start_x,start_x+max_width-1),Globals.level_rng.randi_range(start_y,start_y+max_height-1),1,1)
-				missing_room_count += 1
-			else:
-				var x_offset = Globals.level_rng.randi_range(min_room_offset_x,max_width-min_room_width)
-				var y_offset = Globals.level_rng.randi_range(min_room_offset_y,max_height-min_room_height)
-			
-				start_x += x_offset
-				start_y += y_offset
-				max_width -= x_offset
-				max_height -= y_offset
-				
-				var width = Globals.level_rng.randi_range(min_room_width,max_width)
-				var height = Globals.level_rng.randi_range(min_room_height,max_height)
-				
-				room = Rect2(start_x,start_y,width,height)
-			
-			if !skip_room:
-				generate_room(map,room)
-			
-			if is_spawn_room:
-				map[start_y+room.size.y/2][start_x+room.size.x/2] = Constants.PLAYER
-			room_grid[y][x] = room
-			room_vector_list.append(Vector2(x,y))
-			loop_count+=1
+			room = Rect2(start_x,start_y,width,height)
+		
+		if !proom.skip:
+			generate_room(map,room)
+		
+		if proom.is_player_room:
+			map[start_y+room.size.y/2][start_x+room.size.x/2] = Constants.PLAYER
+		room_grid[proom.y][proom.x] = room
+		room_vector_list.append(Vector2(proom.x,proom.y))
+		loop_count+=1
 	
 	select_and_generate_corridors(map,room_grid,room_vector_list)
 	

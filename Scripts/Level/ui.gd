@@ -29,6 +29,6 @@ func format_stats(player):
 		stats.gold,
 		stats.armor,
 		armor_bonus,
-		stats.current_exp,
-		stats.max_exp
+		stats.player_lvl,
+		stats.exp
 	]

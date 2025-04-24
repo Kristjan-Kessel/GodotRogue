@@ -16,8 +16,8 @@ func _ready():
 	Globals.initialize_randomness()
 	print("Using seed: ", Globals.rng_seed)
 	ui.update_stats(player, turn)
-	#new_level()
-	test_level()
+	new_level()
+	#test_level()
 
 func get_tile(position: Vector2) -> Tile:
 	if position.y >= 0 and position.y < map_data.size():
@@ -111,7 +111,7 @@ func render_map():
 	for y in range(map_data.size()):
 		for x in range(map_data[y].size()):
 			var tile = map_data[y][x]
-			if tile.discovered:
+			if true: #tile.discovered:
 				if tile.entity != null && (tile.entity == player || tile.entity.is_visible):
 					map_str += tile.entity.ascii
 				elif tile.item != null:
@@ -228,6 +228,7 @@ func _on_player_log_message(new_message: Variant) -> void:
 
 func _on_player_command_find(direction: Vector2) -> void:
 	var bypass_important = true
+	var last_tile = get_tile(player.position)
 	while true:
 		var new_position = player.position + direction
 		var next_tile = get_tile(new_position)
@@ -238,6 +239,8 @@ func _on_player_command_find(direction: Vector2) -> void:
 		var left_tile = get_tile(player.position + left_direction)
 		var right_tile = get_tile(player.position + right_direction)
 		
+		
+		
 		if !bypass_important:
 			if left_tile != null && left_tile.is_interesting():
 				break
@@ -246,7 +249,18 @@ func _on_player_command_find(direction: Vector2) -> void:
 			if next_tile != null && next_tile.is_interesting():
 				break
 		bypass_important = false
+		
+		last_tile = get_tile(player.position)
 		var moved = move_player(new_position)
+		
+		if next_tile.type == "CORRIDOR":
+			var walkable_directions = 0
+			for ntile in get_tile_neighbours(next_tile):
+				if ntile.type == "CORRIDOR" && ntile != last_tile:
+					walkable_directions += 1
+			if walkable_directions > 1:
+				break
+		
 		if !moved:
 			if get_tile(player.position).type == "CORRIDOR":
 				if left_tile.is_walkable:
