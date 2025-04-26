@@ -3,7 +3,7 @@ extends Node
 # Global variables
 const map_width: int = 3*35
 const map_height: int = 3*8
-var rng_seed: int = 529088871
+var rng_seed: int = -1 #529088871
 var rng: RandomNumberGenerator = RandomNumberGenerator.new()
 var level_rng: RandomNumberGenerator = RandomNumberGenerator.new()
 

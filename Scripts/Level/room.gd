@@ -24,3 +24,19 @@ func get_center_tile() -> Tile:
     var y = tile_grid.size()/2
     var x = tile_grid[y].size()/2
     return get_tile(Vector2(x,y))
+
+func get_random_valid_tile(valid_tiles: Array, rng) -> Tile:
+    var valid_tile_set = {} 
+
+    for tile in valid_tiles:
+        valid_tile_set[tile] = true
+        
+    var matching_tiles = []
+    for row in tile_grid:
+        for tile in row:
+            if valid_tile_set.has(tile):  
+                matching_tiles.append(tile)
+    
+    if matching_tiles.size() > 0:
+        return matching_tiles[rng.randi_range(0, matching_tiles.size() - 1)] 
+    return null

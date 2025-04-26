@@ -4,7 +4,7 @@ signal action_taken()
 signal player_move(new_position)
 signal log_message(new_message)
 signal command_find(direction)
-signal open_inventory(text)
+signal open_inventory(text, items)
 signal render_map()
 signal drop_item(item)
 signal open_help_menu()
@@ -28,25 +28,32 @@ var current_command = CommandType.NONE
 # Inventory
 var inventory = []
 var armor_item = null
-var weapon_item = Weapon.new("Dagger","Just a basic dagger",0,6)
+var weapon_item = null
 
 func _ready() -> void:
     ascii = Constants.PLAYER
     
-    inventory.append(Item.new("Totem of debugging","Used to test if the inventory is functioning correctly"))
-    inventory.append(Weapon.new("Sword +1","Grants +1 to damage and hit",1,10))
-    inventory.append(Armor.new("Armor +1","Grants +1 to armor",1))
-    inventory.append(Potion.new())
-    inventory.append(StrengthPotion.new())
+    #inventory.append(Item.new("Totem of debugging","Used to test if the inventory is functioning correctly"))
+    var start_weapon = Weapon.new("Dagger","Just a dagger with a damage dice of 6",0,6)
+    inventory.append(start_weapon)
+    weapon_item = start_weapon
+    inventory.append(Armor.new("Leather armor","Just some leather armor with an armor class of 5",5))
+ 
 func _process(delta: float) -> void:
     if action_delay_timer > 0.0:
         action_delay_timer -= delta
         return
     
+    if Input.is_action_just_pressed("command_cancel"):
+        current_command = CommandType.NONE
+        log_message.emit("")
+        render_map.emit()
+        return
+    
     match current_command:
         CommandType.DROP:
             if Input.is_action_just_pressed("view_options"):
-                open_inventory.emit("- Select an item to drop -")
+                open_inventory.emit("- Select an item to drop -",inventory)
             else:	
                 var item = get_item_from_key()
                 if item != null:
@@ -54,14 +61,20 @@ func _process(delta: float) -> void:
             return
         CommandType.USE_ITEM:
             if Input.is_action_just_pressed("view_options"):
-                open_inventory.emit("- Select an item to use -")
+                var valid_items = inventory.filter(func(item) -> bool:
+                    return item.type == item.Type.USEABLE
+                )
+                if valid_items.size() == 0:
+                    log_message.emit("No items to use.")
+                    clear_command()
+                    return
+                open_inventory.emit("- Select an item to use -", valid_items)
             else:	
                 var item = get_item_from_key()
                 if item != null:
                     if item.type == item.Type.USEABLE:
                         log_message.emit("Used "+item.label)
                         item.on_use(self)
-                        inventory.erase(item)
                     else:
                         log_message.emit("Invalid item.")
                         current_command = CommandType.NONE
@@ -69,37 +82,53 @@ func _process(delta: float) -> void:
             return
         CommandType.WEAR_ARMOR:
             if Input.is_action_just_pressed("view_options"):
-                open_inventory.emit("- Select an item to wear as armor -")
+                var valid_items = inventory.filter(func(item) -> bool:
+                    return item.type == item.Type.ARMOR
+                )
+                if valid_items.size() == 0:
+                    log_message.emit("No armor to wear.")
+                    clear_command()
+                    return
+                open_inventory.emit("- Select an item to wear as armor -",valid_items)
             else:	
                 var item = get_item_from_key()
                 if item != null:
                     if item.type == item.Type.ARMOR:
-                        if armor_item != null:
-                            inventory.append(armor_item)
+                        if item == armor_item:
+                            log_message.emit("You are already wearing that.")
+                            current_command = CommandType.NONE
+                            return
                         armor_item = item
-                        stats.bonus_armor = armor_item.armor_bonus
-                        inventory.erase(item)
+                        stats.armor_class = armor_item.armor_class
                         log_message.emit("Wore "+item.label+" as armor.")
                     else:
                         log_message.emit("Invalid item.")
-                        current_command = CommandType.NONE
+                    current_command = CommandType.NONE
                     render_map.emit()
             return
         CommandType.WIELD_WEAPON:
             if Input.is_action_just_pressed("view_options"):
-                open_inventory.emit("- Select an item to wield as a weapon -")
+                var valid_items = inventory.filter(func(item) -> bool:
+                    return item.type == item.Type.WEAPON
+                )
+                if valid_items.size() == 0:
+                    log_message.emit("No weapons to wield.")
+                    clear_command()
+                    return
+                open_inventory.emit("- Select an item to wield as a weapon -", valid_items)
             else:	
                 var item = get_item_from_key()
                 if item != null:
                     if item.type == item.Type.WEAPON:
-                        if weapon_item != null:
-                            inventory.append(weapon_item)
+                        if item == weapon_item:
+                            log_message.emit("You are already wielding that.")
+                            current_command = CommandType.NONE
+                            return
                         weapon_item = item
-                        inventory.erase(item)
                         log_message.emit("Wielded "+item.label+" as a weapon.")
                     else:
                         log_message.emit("Invalid item.")
-                        current_command = CommandType.NONE
+                    current_command = CommandType.NONE
                     render_map.emit()
             return
         CommandType.INVENTORY:
@@ -173,7 +202,7 @@ func _process(delta: float) -> void:
             delay_actions(0.1)
         elif Input.is_action_just_pressed("command_inventory"):
             current_command = CommandType.INVENTORY
-            open_inventory.emit("- Press space to continue -")
+            open_inventory.emit("- Press space to continue -", inventory)
         elif Input.is_action_just_pressed("command_drop"):
             current_command = CommandType.DROP
             log_message.emit("Choose an item to drop (a-z). press (*) to view options")
@@ -188,7 +217,7 @@ func _process(delta: float) -> void:
                 inventory.append(armor_item)
                 armor_item = null
                 log_message.emit("Took off armor.")
-                stats.bonus_armor = 0
+                stats.armor_class = 1
                 render_map.emit()
             else:
                 log_message.emit("No armor to take off.")

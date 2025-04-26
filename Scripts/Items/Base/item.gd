@@ -9,11 +9,12 @@ var ascii = Constants.ITEM
 var type: Type = Type.ITEM
 
 func _init(_label: String, _description: String):
-	label = _label
-	description = _description
+    label = _label
+    description = _description
 
-func on_pickup(player: Node, tile: Tile):
-	player.inventory.append(self)
+func on_pickup(player: Node, tile: Tile) -> String:
+    player.inventory.append(self)
+    return "you picked up "+label
 
 func on_use(player: Node):
-	pass
+    pass

@@ -30,8 +30,8 @@ func attack_player(player: Node) -> String:
     var crit = hit == attack
     var result = ""
     
-    if hit > player.stats.armor || crit:
-        player.stats.current_hp -= hit - player.stats.armor
+    if hit > player.stats.armor_class || crit:
+        player.stats.current_hp -= hit - player.stats.armor_class
         if crit:
             result = "The %s has greatly injured you." % label	
         else:

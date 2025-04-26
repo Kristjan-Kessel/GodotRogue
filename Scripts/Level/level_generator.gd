@@ -17,6 +17,9 @@ static func generate_level(player: Node) -> Array:
     var room_grid = [[null,null,null],[null,null,null],[null,null,null]]
     var room_list = []
 
+    # To track floor tiles that can support items and enemies (Ex: stairs and player tile cannot.)
+    var spawning_tiles = []
+
     for y in range(Globals.map_height):
         var row = []
         for x in range(Globals.map_width):
@@ -71,17 +74,20 @@ static func generate_level(player: Node) -> Array:
             room.size.y = Globals.level_rng.randi_range(min_room_height,max_height)
         
         if !room.skip:
-            generate_room(map,room)
+            generate_room(map,room,spawning_tiles)
             
-            var center_tile = room.get_center_tile()
             if room.is_exit_room:
-                center_tile.type = "STAIRS"
-                center_tile.is_important = true
-                center_tile.ascii = Constants.STAIRS
+                var exit_tile = room.get_random_valid_tile(spawning_tiles, Globals.level_rng)
+                exit_tile.type = "STAIRS"
+                exit_tile.is_important = true
+                exit_tile.ascii = Constants.STAIRS
+                spawning_tiles.erase(exit_tile)
 
             if room.is_player_room:
-                center_tile.entity = player
-                player.position = center_tile.position
+                var player_tile = room.get_random_valid_tile(spawning_tiles, Globals.level_rng)
+                player_tile.entity = player
+                player.position = player_tile.position
+                spawning_tiles.erase(player_tile)
         
         room_grid[room.grid_position.y][room.grid_position.x] = room
         loop_count+=1
@@ -90,9 +96,80 @@ static func generate_level(player: Node) -> Array:
     
     # Spawn enemies and items
     var enemies = []
-    
+    generate_loot(spawning_tiles,player)
     return [map, enemies, room_list]
 
+static var low_tier_loot = [
+    Weapon.new("Shortsword", "a short sword with a damage dice of 8", 1, 8),
+    Weapon.new("Dagger +2", "Grants +2 to attacks with a damage dice of 6", 2, 6),  
+    Armor.new("Chainmail","Has an armor class of 6",6),
+    Potion.new(),
+    Potion.new(),
+    Potion.new(),
+    Potion.new(),
+    StrengthPotion.new(),
+    Gold.new(),
+    Gold.new(),
+    Gold.new(),
+    Gold.new(),
+    Gold.new()
+    ]
+static var mid_tier_loot = [
+    Weapon.new("Longsword +1", "Grants +1 to attacks with a damage dice of 10", 1, 10), 
+    Armor.new("Plate armor","Has an armor class of 8",8),
+    Potion.new(),
+    Potion.new(),
+    Potion.new(),
+    Potion.new(),
+    StrengthPotion.new(),
+    Gold.new(),
+    Gold.new(),
+    Gold.new(),
+    Gold.new(),
+    Gold.new()
+    ]
+static var high_tier_loot = [
+    Weapon.new("Greatsword +2", "Grants +2 to attacks with a damage dice of 12", 2, 12), 
+    Armor.new("Heavyplate armor","Has an armor class of 10",10),
+    Potion.new(),
+    Potion.new(),
+    Potion.new(),
+    Potion.new(),
+    StrengthPotion.new(),
+    Gold.new(),
+    Gold.new(),
+    Gold.new(),
+    Gold.new(),
+    Gold.new()
+    ]
+static var fallback_pool = [
+    Potion.new(),
+    Gold.new(),
+    Gold.new()
+    ]
+
+const min_loot = 5
+const max_loot = 8
+
+static func generate_loot(valid_tiles: Array, player: Node):
+    var loot_pool
+    if player.stats.level <= 3:
+        loot_pool = low_tier_loot
+    elif player.stats.level <= 6:
+        loot_pool = mid_tier_loot
+    elif player.stats.level <= 9:
+        loot_pool = high_tier_loot
+    
+    var amount_to_spawn = Globals.level_rng.randi_range(min_loot,max_loot)
+    for i in range(amount_to_spawn):
+        if loot_pool.size() == 0:
+            loot_pool = fallback_pool.duplicate()
+        var tile = valid_tiles[Globals.level_rng.randi_range(0,valid_tiles.size()-1)]
+        valid_tiles.erase(tile)
+        var item = loot_pool[Globals.level_rng.randi_range(0,loot_pool.size()-1)]
+        tile.item = item
+        loot_pool.erase(item)
+    
 static func select_and_generate_corridors(map: Array, room_grid: Array, room_list: Array):
     var orphan_rooms = Array(room_list)
     var current_room = room_list[Globals.level_rng.randi_range(0,room_list.size()-1)]
@@ -263,7 +340,7 @@ static func carve_corridor_cell(position: Vector2, map: Array):
     else:
         map[position.y][position.x] = Tile.new("CORRIDOR", true, Constants.CORRIDOR, false, position)
 
-static func generate_room(map: Array, room: Room):
+static func generate_room(map: Array, room: Room, spawning_tiles: Array):
     var tile_grid = []
     for y in range(room.size.y):
         var row = []
@@ -276,10 +353,15 @@ static func generate_room(map: Array, room: Room):
                 tile = Tile.new("WALL", false, Constants.WALL, false, position)
             else:
                 tile = Tile.new("FLOOR", true, Constants.FLOOR, false, position)
+                spawning_tiles.append(tile)
             map[position.y][position.x] = tile 
             row.append(tile)
         tile_grid.append(row)
     room.tile_grid = tile_grid
+
+static func get_level_from_file(file_name: String, player: Node) -> Array:
+    var ascii = get_ascii_from_file(file_name)
+    return convert_ascii_to_tiles(ascii, player)
 
 static func get_ascii_from_file(file_name: String) -> Array:
     var path = "res://Preset Levels/" + file_name

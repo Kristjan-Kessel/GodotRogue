@@ -2,7 +2,7 @@ extends Item
 class_name Potion
 
 func _init():
-    label = "Potion"
+    label = "Potion of Healing"
     description = "Heals you to full health when drank"
     type = Type.USEABLE
 

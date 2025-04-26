@@ -1,10 +1,10 @@
 extends Item
 class_name Armor
 
-var armor_bonus: int
+var armor_class: int
 
-func _init(_label: String, _description: String, _armor_bonus: int):
-	label = _label
-	description = _description
-	armor_bonus = _armor_bonus
-	type = Type.ARMOR
+func _init(_label: String, _description: String, _armor_class: int):
+    label = _label
+    description = _description
+    armor_class = _armor_class
+    type = Type.ARMOR

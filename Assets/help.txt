@@ -1,7 +1,7 @@
 F1   list of commands                  Esc   cancel command
 F7   inventory of your possessions     i     inventory
 .    rest
-<    use a staircase
+,    use a staircase
 d    drop object                       q     use an item
 f    <dir> find something              w     wield a weapon
 T    take armor off                    W     wear armor

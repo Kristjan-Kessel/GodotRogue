@@ -18,8 +18,8 @@ func _ready():
     Globals.initialize_randomness()
     print("Using seed: ", Globals.rng_seed)
     ui.update_stats(player, turn)
-    #new_level()
-    test_level("final.txt")
+    new_level()
+    #test_level("final.txt")
     #test_level("test.txt")
 
 func get_tile(position: Vector2) -> Tile:
@@ -71,8 +71,7 @@ func spawn_enemies_from_list(enemy_list):
         enemy.enemy_move.connect(move_enemy)
 
 func test_level(file: String):
-    var ascii_map = LevelGenerator.get_ascii_from_file(file)
-    var level_data = LevelGenerator.convert_ascii_to_tiles(ascii_map, player)
+    var level_data = LevelGenerator.get_level_from_file(file,player)
     map_data = level_data[0]
     spawn_enemies_from_list(level_data[1])
     update_astar()
@@ -80,7 +79,11 @@ func test_level(file: String):
     render_map()
 
 func new_level():
-    var level_data = LevelGenerator.generate_level(player)
+    var level_data
+    if player.stats.level > 9:
+        level_data = LevelGenerator.get_level_from_file("final.txt",player)
+    else:
+        level_data = LevelGenerator.generate_level(player)
     map_data = level_data[0]
     spawn_enemies_from_list(level_data[1])
     update_astar()
@@ -146,13 +149,18 @@ func reveal_room(start_tile: Tile):
             if ntile.type in ["WALL", "FLOOR", "DOOR", "STAIRS"]:
                 queue.append(ntile)
 
-func render_inventory(text: String):
+func render_inventory(text: String, items: Array):
     var map_str = ""
     for i in range(0,player.inventory.size()):
         var item = player.inventory[i]
-        map_str += Constants.INVENTORY_CHARS[i]+") "
-        map_str += item.label
-        map_str += "\n"
+        if items.has(item):
+            map_str += Constants.INVENTORY_CHARS[i]+") "
+            map_str += item.label
+            if item == player.armor_item:
+                map_str += " (Currently being worn)"
+            elif item == player.weapon_item:
+                map_str += " (Currently being wielded)"
+            map_str += "\n"
     
     ui.set_stats_message(text)
     level.text = map_str
@@ -198,8 +206,7 @@ func move_player(new_position: Vector2) -> bool:
             
             if target_tile.item != null:
                 var item = target_tile.item
-                item.on_pickup(player, target_tile)
-                log_message = "You picked up "+item.label
+                log_message = item.on_pickup(player, target_tile)
                 target_tile.item = null
         else:
             var entity = target_tile.entity
@@ -209,6 +216,8 @@ func move_player(new_position: Vector2) -> bool:
     return moved
 
 func on_action_taken():
+    print("turn: "+str(turn))
+    player.stats.turns_until_regen -= 1
     var player_tile = get_tile(player.position)
     connect_tile(player_tile)
     for enemy in enemies.get_children():
@@ -292,8 +301,8 @@ func _on_player_command_find(direction: Vector2) -> void:
             else:
                 break
 
-func _on_player_open_inventory(text: String) -> void:
-    render_inventory(text)
+func _on_player_open_inventory(text: String, items: Array) -> void:
+    render_inventory(text,items)
 
 func _on_player_render_map() -> void:
     render_map()
@@ -320,7 +329,6 @@ func _on_player_open_help_menu() -> void:
         var text = file.get_as_text()
         ui.set_stats_message("- Press space to continue -")
         level.text = text
-
 
 func _on_player_use_stairs() -> void:
     var tile = get_tile(player.position)

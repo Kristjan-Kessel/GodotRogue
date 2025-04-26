@@ -5,5 +5,5 @@ func _ready() -> void:
     armor = 8
     attack = 10
     label = "Goblin"
-    ascii = "g"
+    ascii = Constants.GOBLIN
     exp = 1
