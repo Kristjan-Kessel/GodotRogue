@@ -1,4 +1,4 @@
-[gd_scene load_steps=6 format=3 uid="uid://cv4l8fxqy3bof"]
+[gd_scene load_steps=7 format=3 uid="uid://cv4l8fxqy3bof"]
 
 [ext_resource type="Script" uid="uid://bkvy11motn7uh" path="res://Scripts/main.gd" id="1_iie3f"]
 [ext_resource type="Script" uid="uid://caphlodsvhhrj" path="res://Scripts/Level/ui.gd" id="2_vud5e"]
@@ -6,18 +6,12 @@
 [ext_resource type="Script" uid="uid://3fxjowsrxau2" path="res://Scripts/Player/player.gd" id="3_s7dad"]
 [ext_resource type="Script" uid="uid://d4cnboecwqpuu" path="res://Scripts/Player/stats.gd" id="5_pbw6q"]
 
+[sub_resource type="Theme" id="Theme_pbw6q"]
+default_font = ExtResource("3_pbw6q")
+default_font_size = 20
+
 [node name="Main" type="Node2D"]
 script = ExtResource("1_iie3f")
-
-[node name="Camera2D" type="Camera2D" parent="."]
-position = Vector2(638, 362)
-
-[node name="Background" type="ColorRect" parent="Camera2D"]
-offset_left = -643.0
-offset_top = -362.0
-offset_right = 705.0
-offset_bottom = 418.0
-color = Color(0.140447, 0.140447, 0.140447, 1)
 
 [node name="Enemies" type="Node" parent="."]
 
@@ -25,24 +19,40 @@ color = Color(0.140447, 0.140447, 0.140447, 1)
 anchors_preset = 5
 anchor_left = 0.5
 anchor_right = 0.5
-offset_left = 11.0
-offset_top = 4.0
-offset_right = 1271.0
-offset_bottom = 707.0
+offset_right = 1280.0
+offset_bottom = 720.0
 grow_horizontal = 2
 script = ExtResource("2_vud5e")
 
-[node name="MapLabel" type="Label" parent="UI"]
+[node name="Camera2D" type="Camera2D" parent="UI"]
+anchor_mode = 0
+
+[node name="Background" type="ColorRect" parent="UI"]
 layout_mode = 2
+size_flags_vertical = 3
+color = Color(0.140447, 0.140447, 0.140447, 1)
+
+[node name="MapLabel" type="RichTextLabel" parent="UI/Background"]
+layout_mode = 1
+offset_right = 47.0
+offset_bottom = 24.0
 size_flags_horizontal = 0
 size_flags_vertical = 2
-theme_override_fonts/font = ExtResource("3_pbw6q")
-theme_override_font_sizes/font_size = 20
-horizontal_alignment = 1
-vertical_alignment = 1
+theme = SubResource("Theme_pbw6q")
+bbcode_enabled = true
+text = "TEST"
+fit_content = true
+scroll_active = false
+autowrap_mode = 0
 
-[node name="StatsLabel" type="Label" parent="UI"]
-layout_mode = 2
+[node name="StatsLabel" type="Label" parent="UI/Background"]
+layout_mode = 1
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_top = -29.0
+offset_right = 1260.0
+grow_vertical = 0
 size_flags_vertical = 10
 theme_override_fonts/font = ExtResource("3_pbw6q")
 theme_override_font_sizes/font_size = 24

@@ -319,30 +319,30 @@ static func convert_ascii_to_tiles(ascii_map: Array, player: Node) -> Array:
             var tile = null
             var position = Vector2(x+offset_x,y+offset_y)
             match ascii_map[y][x]:
-                Constants.WALL:
+                Constants.TXT_WALL:
                     tile = Tile.new("WALL", false, Constants.WALL, false, position)
-                Constants.CEILING:
+                Constants.TXT_CEILING:
                     tile = Tile.new("WALL", false, Constants.CEILING,false, position)
-                Constants.FLOOR:
+                Constants.TXT_FLOOR:
                     tile = Tile.new("FLOOR", true, Constants.FLOOR,false, position)
-                Constants.DOOR:
+                Constants.TXT_DOOR:
                     tile = Tile.new("DOOR", true, Constants.DOOR,true, position)
-                Constants.CORRIDOR:
+                Constants.TXT_CORRIDOR:
                     tile = Tile.new("CORRIDOR",true,Constants.CORRIDOR,false, position)
-                Constants.PLAYER:
+                Constants.TXT_PLAYER:
                     tile = Tile.new("FLOOR",true,Constants.FLOOR,false, position)
                     player.position = position;
                     tile.entity = player
-                Constants.GOLD:
+                Constants.TXT_GOLD:
                     tile = Tile.new("FLOOR",true,Constants.FLOOR, false, position)
                     tile.item = Gold.new()
-                Constants.STAIRS:
+                Constants.TXT_STAIRS:
                     tile = Tile.new("STAIRS",true,Constants.STAIRS, false, position)
                 "&":
                     tile = Tile.new("FLOOR",true,Constants.FLOOR,false, position)
                     var enemy = EnemyData.new(position,"res://Scripts/Enemies/goblin.tscn", true)
                     enemies.append(enemy)
-                Constants.ARTIFACT:
+                Constants.TXT_ARTIFACT:
                     tile = Tile.new("FLOOR", true, Constants.FLOOR, false, position)
                     tile.item = Artifact.new()
                 _:

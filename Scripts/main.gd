@@ -1,9 +1,9 @@
 extends Node2D
 
-const debug_sight = false
+const debug_sight = true
 
 var map_data : Array = []
-@onready var level = $UI/MapLabel
+@onready var level = $UI/Background/MapLabel
 @onready var player = $Player
 @onready var ui = $UI
 @onready var enemies = $Enemies
@@ -18,8 +18,8 @@ func _ready():
     Globals.initialize_randomness()
     print("Using seed: ", Globals.rng_seed)
     ui.update_stats(player, turn)
-    new_level()
-    #test_level("final.txt")
+    #new_level()
+    test_level("final.txt")
     #test_level("test.txt")
 
 func get_tile(position: Vector2) -> Tile:
