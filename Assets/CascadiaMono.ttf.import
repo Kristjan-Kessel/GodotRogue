@@ -2,13 +2,13 @@
 
 importer="font_data_dynamic"
 type="FontFile"
-uid="uid://bx2lyt3o5pdbd"
-path="res://.godot/imported/RobotoMono-Medium.ttf-a9d5edefae82e25219d65ec79327bd70.fontdata"
+uid="uid://cqu63ixffio5h"
+path="res://.godot/imported/CascadiaMono.ttf-5691b4405fdbf5761efbee756bd33ddd.fontdata"
 
 [deps]
 
-source_file="res://RobotoMono-Medium.ttf"
-dest_files=["res://.godot/imported/RobotoMono-Medium.ttf-a9d5edefae82e25219d65ec79327bd70.fontdata"]
+source_file="res://Assets/CascadiaMono.ttf"
+dest_files=["res://.godot/imported/CascadiaMono.ttf-5691b4405fdbf5761efbee756bd33ddd.fontdata"]
 
 [params]
 
@@ -22,7 +22,7 @@ msdf_size=48
 allow_system_fallback=true
 force_autohinter=false
 hinting=1
-subpixel_positioning=1
+subpixel_positioning=4
 keep_rounding_remainders=true
 oversampling=0.0
 Fallbacks=null

@@ -11,16 +11,16 @@ var is_exit_room = false
 var skip = false
 
 func get_tile(position: Vector2) -> Tile:
-	return tile_grid[position.y][position.x]
+    return tile_grid[position.y][position.x]
 
 func print_info():
-	for row in tile_grid:
-		var msg = ""
-		for tile in row:
-			msg = msg+tile.ascii
-		print(msg)
+    for row in tile_grid:
+        var msg = ""
+        for tile in row:
+            msg = msg+tile.ascii
+        print(msg)
 
 func get_center_tile() -> Tile:
-	var y = tile_grid.size()/2
-	var x = tile_grid[y].size()/2
-	return get_tile(Vector2(x,y))
+    var y = tile_grid.size()/2
+    var x = tile_grid[y].size()/2
+    return get_tile(Vector2(x,y))

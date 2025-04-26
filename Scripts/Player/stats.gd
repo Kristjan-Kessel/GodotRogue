@@ -14,19 +14,19 @@ signal player_death
 var bonus_armor = 0
 
 func _set_current_exp(new_exp):
-	exp = new_exp
-	if exp > player_lvl*10:
-		player_lvl += 1
-		max_hp = max_hp + Globals.rng.randi_range(2,10)
-		current_hp = max_hp
+    exp = new_exp
+    if exp > player_lvl*10:
+        player_lvl += 1
+        max_hp = max_hp + Globals.rng.randi_range(2,10)
+        current_hp = max_hp
 
 func _set_current_hp(new_hp):
-	current_hp = clamp(new_hp,0,max_hp)
-	if current_hp == 0:
-		player_death.emit()
+    current_hp = clamp(new_hp,0,max_hp)
+    if current_hp == 0:
+        player_death.emit()
 
 func get_total_armor():
-	return armor+bonus_armor
-	
+    return armor+bonus_armor
+    
 func get_attack():
-	return (strength-10)/2
+    return (strength-10)/2
