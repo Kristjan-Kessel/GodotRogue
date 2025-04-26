@@ -1,5 +1,7 @@
 extends Node2D
 
+const debug_sight = false
+
 var map_data : Array = []
 @onready var level = $UI/MapLabel
 @onready var player = $Player
@@ -16,8 +18,8 @@ func _ready():
     Globals.initialize_randomness()
     print("Using seed: ", Globals.rng_seed)
     ui.update_stats(player, turn)
-    #new_level()
-    test_level("final.txt")
+    new_level()
+    #test_level("final.txt")
     #test_level("test.txt")
 
 func get_tile(position: Vector2) -> Tile:
@@ -82,14 +84,12 @@ func new_level():
     map_data = level_data[0]
     spawn_enemies_from_list(level_data[1])
     update_astar()
-    #reveal_room(get_tile(player.position))
+    reveal_room(get_tile(player.position))
     render_map()
 
 func render_map():
     var ptile = get_tile(player.position)
     var max_distance = 99
-    
-    var debug_sight = true
     
     # Checks for line of sight with enemies
     for enemy in enemies.get_children():
@@ -143,7 +143,7 @@ func reveal_room(start_tile: Tile):
         current_tile.discovered = true
 
         for ntile in get_tile_neighbours(current_tile):
-            if ntile.type in ["WALL", "FLOOR", "DOOR"]:
+            if ntile.type in ["WALL", "FLOOR", "DOOR", "STAIRS"]:
                 queue.append(ntile)
 
 func render_inventory(text: String):

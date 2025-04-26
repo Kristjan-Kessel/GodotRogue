@@ -59,9 +59,9 @@ func _process(delta: float) -> void:
                 var item = get_item_from_key()
                 if item != null:
                     if item.type == item.Type.USEABLE:
+                        log_message.emit("Used "+item.label)
                         item.on_use(self)
                         inventory.erase(item)
-                        log_message.emit("Used "+item.label)
                     else:
                         log_message.emit("Invalid item.")
                         current_command = CommandType.NONE

@@ -91,7 +91,7 @@ static func generate_level(player: Node) -> Array:
     # Spawn enemies and items
     var enemies = []
     
-    return [map, room_list, enemies]
+    return [map, enemies, room_list]
 
 static func select_and_generate_corridors(map: Array, room_grid: Array, room_list: Array):
     var orphan_rooms = Array(room_list)
@@ -343,7 +343,8 @@ static func convert_ascii_to_tiles(ascii_map: Array, player: Node) -> Array:
                     var enemy = EnemyData.new(position,"res://Scripts/Enemies/goblin.tscn", true)
                     enemies.append(enemy)
                 Constants.ARTIFACT:
-                    tile = Tile.new("FLOOR", false, Constants.ARTIFACT, false, position)
+                    tile = Tile.new("FLOOR", true, Constants.FLOOR, false, position)
+                    tile.item = Artifact.new()
                 _:
                     tile = Tile.new("EMPTY", false,Constants.EMPTY, false, position)
             tile_map[y+offset_y][x+offset_x] = tile

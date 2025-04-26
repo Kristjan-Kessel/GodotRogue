@@ -9,6 +9,16 @@
 [node name="Main" type="Node2D"]
 script = ExtResource("1_iie3f")
 
+[node name="Camera2D" type="Camera2D" parent="."]
+position = Vector2(638, 362)
+
+[node name="Background" type="ColorRect" parent="Camera2D"]
+offset_left = -643.0
+offset_top = -362.0
+offset_right = 705.0
+offset_bottom = 418.0
+color = Color(0.140447, 0.140447, 0.140447, 1)
+
 [node name="Enemies" type="Node" parent="."]
 
 [node name="UI" type="VBoxContainer" parent="."]
@@ -21,6 +31,15 @@ offset_right = 1271.0
 offset_bottom = 707.0
 grow_horizontal = 2
 script = ExtResource("2_vud5e")
+
+[node name="MapLabel" type="Label" parent="UI"]
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 2
+theme_override_fonts/font = ExtResource("3_pbw6q")
+theme_override_font_sizes/font_size = 20
+horizontal_alignment = 1
+vertical_alignment = 1
 
 [node name="StatsLabel" type="Label" parent="UI"]
 layout_mode = 2
@@ -36,9 +55,6 @@ script = ExtResource("3_s7dad")
 script = ExtResource("5_pbw6q")
 current_hp = 6
 strength = 14
-
-[node name="Camera2D" type="Camera2D" parent="."]
-position = Vector2(638, 362)
 
 [connection signal="action_taken" from="Player" to="." method="on_action_taken"]
 [connection signal="command_find" from="Player" to="." method="_on_player_command_find"]
