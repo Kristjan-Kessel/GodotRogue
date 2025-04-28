@@ -31,7 +31,10 @@ static var low_tier_loot = [
     Potion.new(),
     Potion.new(),
     Potion.new(),
+    Potion.new(),
     StrengthPotion.new(),
+    Gold.new(),
+    Gold.new(),
     Gold.new(),
     Gold.new(),
     Gold.new(),
@@ -73,7 +76,7 @@ static var fallback_pool = [
     ]
 
 const min_loot = 5
-const max_loot = 8
+const max_loot = 10
 
 # Enemy spawning pools
 static var low_tier_enemies = ["goblin"]

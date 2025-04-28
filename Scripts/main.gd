@@ -228,7 +228,7 @@ func on_action_taken():
         if enemy.health <= 0:
             log_message = "You defeated the %s." % enemy.label
             tile.entity = null
-            player.stats.exp += enemy.exp
+            player.stats.exp += Globals.rng.randi_range(1,2)
             enemy.queue_free()
             connect_tile(tile)
         else:

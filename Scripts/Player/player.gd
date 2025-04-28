@@ -247,17 +247,14 @@ func move_player():
 
 func attack_enemy(enemy: Enemy):
     current_command = CommandType.ATTACK
-    var hit = Globals.rng.randi_range(1,20)
-    var crit = hit == 20
+    var hit = Globals.rng.randi_range(1,weapon_item.dice)
+    var crit = hit == weapon_item.dice
     var hit_bonus = weapon_item.bonus_attack + stats.get_attack_bonus()
     hit += hit_bonus
-    
-    if hit>=enemy.armor || crit:
-        var damage = Globals.rng.randi_range(1,weapon_item.dice)
-        damage += hit_bonus
-        enemy.health -= damage
+    hit = hit - enemy.armor
+    if hit>0:
+        enemy.health -= hit
         if crit:
-            damage += damage
             log_message.emit("You scored an excellent hit on the %s. [continue]" % enemy.label)	
         else:
             log_message.emit("You scored a hit on the %s. [continue]" % enemy.label)	

@@ -24,7 +24,7 @@ func _set_current_regen(new_turns):
 
 func _set_current_exp(new_exp):
     exp = new_exp
-    if exp > player_lvl*10:
+    if exp >= player_lvl*10:
         player_lvl += 1
         max_hp = max_hp + Globals.rng.randi_range(2,10)
         current_hp = max_hp

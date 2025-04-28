@@ -93,12 +93,12 @@ static func generate_level(player: Node) -> Array:
         loop_count+=1
     
     select_and_generate_corridors(map,room_grid,room_list)
-    
-    generate_loot(spawning_tiles,player)
-    var enemies = generate_enemies(spawning_tiles,player)
+        
+    generate_loot(spawning_tiles, room_list, player)
+    var enemies = generate_enemies(spawning_tiles, room_list, player)
     return [map, enemies, room_list]
 
-static func generate_loot(spawning_tiles: Array, player: Node):
+static func generate_loot(spawning_tiles: Array, rooms: Array, player: Node):
     var loot_pool
     var valid_tiles = spawning_tiles.duplicate()
     if player.stats.level <= 3:
@@ -108,17 +108,25 @@ static func generate_loot(spawning_tiles: Array, player: Node):
     elif player.stats.level <= 9:
         loot_pool = Globals.high_tier_loot
     
+    var non_skip_rooms = rooms.filter(func(room):
+        return !room.skip
+    )
+    var valid_rooms = non_skip_rooms.duplicate()
     var amount_to_spawn = Globals.level_rng.randi_range(Globals.min_loot,Globals.max_loot)
     for i in range(amount_to_spawn):
         if loot_pool.size() == 0:
             loot_pool = Globals.fallback_pool.duplicate()
-        var tile = valid_tiles[Globals.level_rng.randi_range(0,valid_tiles.size()-1)]
-        valid_tiles.erase(tile)
+        if valid_rooms.size() == 0:
+            valid_rooms = non_skip_rooms.duplicate()
+        var room = valid_rooms[Globals.level_rng.randi_range(0,valid_rooms.size()-1)]
+        var tile = room.get_random_valid_tile(valid_tiles,Globals.level_rng)
         var item = loot_pool[Globals.level_rng.randi_range(0,loot_pool.size()-1)]
         tile.item = item
+        valid_tiles.erase(tile)
+        valid_rooms.erase(room)
         loot_pool.erase(item)
 
-static func generate_enemies(spawning_tiles: Array, player: Node):
+static func generate_enemies(spawning_tiles: Array, rooms: Array, player: Node):
     var enemy_pool
     var enemies = []
     var valid_tiles = spawning_tiles.duplicate()
@@ -130,17 +138,26 @@ static func generate_enemies(spawning_tiles: Array, player: Node):
         enemy_pool = Globals.high_tier_enemies
     
     var amount_to_spawn = Globals.level_rng.randi_range(Globals.min_enemies,Globals.max_enemies)
+    var non_skip_rooms = rooms.filter(func(room):
+        return !room.skip
+    )
+    var valid_rooms = non_skip_rooms.duplicate()
+    
     for i in range(amount_to_spawn):
-        var tile = valid_tiles[Globals.level_rng.randi_range(0,valid_tiles.size()-1)]
-        valid_tiles.erase(tile)
+        if valid_rooms.size() == 0:
+            valid_rooms = non_skip_rooms.duplicate()
+        var room = valid_rooms[Globals.level_rng.randi_range(0,valid_rooms.size()-1)]
+        var tile = room.get_random_valid_tile(valid_tiles,Globals.level_rng)
         var enemy_type = enemy_pool[Globals.level_rng.randi_range(0,enemy_pool.size()-1)]
         var enemy = EnemyData.new(tile.position,enemy_type,false)
         enemies.append(enemy)
+        valid_tiles.erase(tile)
+        valid_rooms.erase(room)
     
     return enemies
 
 static func select_and_generate_corridors(map: Array, room_grid: Array, room_list: Array):
-    var orphan_rooms = Array(room_list)
+    var orphan_rooms = room_list.duplicate()
     var current_room = room_list[Globals.level_rng.randi_range(0,room_list.size()-1)]
     var connected_rooms = []
     var initial_path_length = 1

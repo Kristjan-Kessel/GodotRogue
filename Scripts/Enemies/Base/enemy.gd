@@ -6,7 +6,6 @@ signal enemy_move(new_position)
 @export var health: int : set = _set_health
 @export var armor: int
 @export var attack: int
-@export var exp: int
 enum State {SLEEPING,IDLE,ATTACKING}
 var state = State.IDLE
 var is_visible = true
