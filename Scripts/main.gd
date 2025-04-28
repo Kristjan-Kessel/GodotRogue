@@ -1,6 +1,6 @@
 extends Node2D
 
-const debug_sight = false
+@export var debug_sight = false
 
 var map_data : Array = []
 @onready var level = $UI/Background/MapLabel
@@ -19,9 +19,9 @@ func _ready():
     Globals.initialize_randomness()
     print("Using seed: ", Globals.rng_seed)
     ui.update_stats(player, turn)
-    new_level()
+    #new_level()
     #test_level("final.txt")
-    #test_level("test.txt")
+    test_level("test.txt")
 
 func get_tile(position: Vector2) -> Tile:
     if position.y >= 0 and position.y < map_data.size():
@@ -41,6 +41,8 @@ func get_tile_neighbours(tile: Tile) -> Array:
     return tiles
 
 func update_astar():
+    astar.clear()
+    astar_bypass.clear()
     for y in range(map_data.size()):
         for x in range(map_data[y].size()):
             var tile = map_data[y][x]
@@ -90,6 +92,10 @@ func new_level():
     else:
         level_data = LevelGenerator.generate_level(player)
     map_data = level_data[0]
+    
+    for child in enemies.get_children():
+        child.free()
+    
     spawn_enemies_from_list(level_data[1])
     update_astar()
     reveal_room(get_tile(player.position))
@@ -201,7 +207,7 @@ func move_player(new_position: Vector2) -> bool:
             if target_tile.type == "DOOR" || target_tile.type == "CORRIDOR":
                 for ntile in get_tile_neighbours(target_tile):
                     if !ntile.discovered:
-                        if ntile.type == "FLOOR":
+                        if ntile.type == "FLOOR" || ntile.type == "STAIRS":
                             reveal_room(ntile)
                         if ntile.type == "CORRIDOR" || ntile.type == "DOOR":
                             ntile.discovered = true
@@ -220,7 +226,7 @@ func move_player(new_position: Vector2) -> bool:
 func on_action_taken():
     player.stats.turns_until_regen -= 1
     var player_tile = get_tile(player.position)
-    #connect_tile(player_tile)
+    connect_tile(player_tile,astar)
     
     for enemy in enemies.get_children():
         var tile = get_tile(enemy.position)

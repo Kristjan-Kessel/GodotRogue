@@ -115,7 +115,7 @@ static func generate_loot(spawning_tiles: Array, rooms: Array, player: Node):
     var amount_to_spawn = Globals.level_rng.randi_range(Pools.min_loot,Pools.max_loot)
     for i in range(amount_to_spawn):
         if loot_pool.size() == 0:
-            loot_pool = Globals.fallback_pool.duplicate()
+            loot_pool = Pools.fallback_pool.duplicate()
         if valid_rooms.size() == 0:
             valid_rooms = non_skip_rooms.duplicate()
         var room = valid_rooms[Globals.level_rng.randi_range(0,valid_rooms.size()-1)]

@@ -1,12 +1,12 @@
 extends Enemy
 
-# Centaur
+# Ice Monster
 
 func _ready() -> void:
-    health = 20
-    armor = 3
-    attack = 15
-    label = "Centaur"
-    ascii = "[color=#632d01]H[/color]"
+    health = 15
+    armor = 5
+    attack = 12
+    label = "Ice Monster"
+    ascii = "[color=#00d1ca]I[/color]"
     min_exp = 2
     max_exp = 3

@@ -21,8 +21,8 @@ func on_turn(path: Array, bypass_path: Array):
         if path.size() > 0:
             enemy_move.emit(path[1], self)
         else:
-            bypass_path.size() > 0
-            enemy_move.emit(bypass_path[1], self)
+            if bypass_path.size() > 0:
+                enemy_move.emit(bypass_path[1], self)
 
 func _set_health(hp: int):
     health = hp
