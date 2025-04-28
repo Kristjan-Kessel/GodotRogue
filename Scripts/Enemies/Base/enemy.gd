@@ -6,6 +6,8 @@ signal enemy_move(new_position)
 @export var health: int : set = _set_health
 @export var armor: int
 @export var attack: int
+var min_exp: int
+var max_exp: int
 enum State {SLEEPING,IDLE,ATTACKING}
 var state = State.IDLE
 var is_visible = true
@@ -40,6 +42,10 @@ func attack_player(player: Node) -> String:
             result = "The %s has injured you." % label
         if player.stats.current_hp == 0:
             result = "The %s has killed you." % label
+        attack_effects(player)
     else:
         result = "The %s misses you." % label
     return result
+
+func attack_effects(player: Node):
+    pass

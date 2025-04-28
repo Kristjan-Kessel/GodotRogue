@@ -44,26 +44,28 @@ func update_astar():
     for y in range(map_data.size()):
         for x in range(map_data[y].size()):
             var tile = map_data[y][x]
-            if tile.is_walkable and (tile.entity == null or tile.entity == player):
-                connect_tile(tile)
+            if tile.is_walkable:
+                if (tile.entity == null or tile.entity == player):
+                    connect_tile(tile,astar)
+                connect_tile(tile,astar_bypass)
 
-func connect_tile(tile):
-    astar.add_point(tile.id, tile.position)
-    astar_bypass.add_point(tile.id, tile.position)
+func connect_tile(tile, astar_i):
+    astar_i.add_point(tile.id, tile.position)
     for ntile in get_tile_neighbours(tile):
-        if ntile != null && ntile.is_walkable && astar.has_point(ntile.id):
-            astar.connect_points(tile.id, ntile.id)
-            astar_bypass.connect_points(tile.id,ntile.id)
+        if ntile != null && ntile.is_walkable && astar_i.has_point(ntile.id):
+            astar_i.connect_points(tile.id, ntile.id)
 
 var enemy_cache = {}
+var enemy_node_scene = load("res://Scripts/Enemies/Base/enemy_node.tscn")
 func spawn_enemies_from_list(enemy_list):
     for enemy_data in enemy_list:
-        var enemy_scene = enemy_cache.get(enemy_data.path)
-        if enemy_scene == null:
-            enemy_scene = load(enemy_data.path)
-            enemy_cache[enemy_data.path] = enemy_scene
+        var enemy_script = enemy_cache.get(enemy_data.path)
+        if enemy_script == null:
+            enemy_script = load(enemy_data.path)
+            enemy_cache[enemy_data.path] = enemy_script
 
-        var enemy = enemy_scene.instantiate()
+        var enemy = enemy_node_scene.instantiate()
+        enemy.set_script(enemy_script)
         enemy.position = enemy_data.position
         enemies.add_child(enemy)
         if enemy_data.is_sleeping:
@@ -101,15 +103,12 @@ func render_map():
         var max_distance = 99
         var is_visible = true
         var etile = get_tile(enemy.position)
-        connect_tile(etile)
-        var path = astar.get_point_path(ptile.id,etile.id)
-        var distance = 0
+        var path = astar_bypass.get_point_path(ptile.id,etile.id)
         for i in range(1, path.size() - 1):
             var tile = get_tile(path[i])
-            distance += 1
             if tile.type == "CORRIDOR":
                 max_distance = 1
-            if distance >= max_distance:
+            if i >= max_distance:
                 is_visible = false
                 break
             if tile.type == "DOOR":
@@ -117,7 +116,6 @@ func render_map():
                 break
             
         enemy.is_visible = is_visible || debug_sight
-        astar.remove_point(etile.id)
         
     var map_str = log_message+"\n"
     for y in range(map_data.size()):
@@ -222,18 +220,18 @@ func move_player(new_position: Vector2) -> bool:
 func on_action_taken():
     player.stats.turns_until_regen -= 1
     var player_tile = get_tile(player.position)
-    connect_tile(player_tile)
+    #connect_tile(player_tile)
     
     for enemy in enemies.get_children():
         var tile = get_tile(enemy.position)
         if enemy.health <= 0:
             log_message = "You defeated the %s." % enemy.label
             tile.entity = null
-            player.stats.exp += Globals.rng.randi_range(1,2)
+            player.stats.exp += Globals.rng.randi_range(enemy.min_exp,enemy.max_exp)
             enemy.queue_free()
-            connect_tile(tile)
+            connect_tile(tile,astar)
         else:
-            connect_tile(tile)
+            connect_tile(tile,astar)
             # Check for line of sight with player
             var bypass_path = astar_bypass.get_point_path(tile.id, player_tile.id)
             var is_visible = true

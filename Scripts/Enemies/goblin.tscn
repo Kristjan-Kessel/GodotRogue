@@ -1,6 +1,0 @@
-[gd_scene load_steps=2 format=3 uid="uid://cjfo4ytte5ile"]
-
-[ext_resource type="Script" uid="uid://11xw3s27c5ly" path="res://Scripts/Enemies/goblin.gd" id="1_y1ke7"]
-
-[node name="goblin" type="Node2D"]
-script = ExtResource("1_y1ke7")

@@ -102,17 +102,17 @@ static func generate_loot(spawning_tiles: Array, rooms: Array, player: Node):
     var loot_pool
     var valid_tiles = spawning_tiles.duplicate()
     if player.stats.level <= 3:
-        loot_pool = Globals.low_tier_loot
+        loot_pool = Pools.low_tier_loot
     elif player.stats.level <= 6:
-        loot_pool = Globals.mid_tier_loot
+        loot_pool = Pools.mid_tier_loot
     elif player.stats.level <= 9:
-        loot_pool = Globals.high_tier_loot
+        loot_pool = Pools.high_tier_loot
     
     var non_skip_rooms = rooms.filter(func(room):
         return !room.skip
     )
     var valid_rooms = non_skip_rooms.duplicate()
-    var amount_to_spawn = Globals.level_rng.randi_range(Globals.min_loot,Globals.max_loot)
+    var amount_to_spawn = Globals.level_rng.randi_range(Pools.min_loot,Pools.max_loot)
     for i in range(amount_to_spawn):
         if loot_pool.size() == 0:
             loot_pool = Globals.fallback_pool.duplicate()
@@ -131,13 +131,13 @@ static func generate_enemies(spawning_tiles: Array, rooms: Array, player: Node):
     var enemies = []
     var valid_tiles = spawning_tiles.duplicate()
     if player.stats.level <= 3:
-        enemy_pool = Globals.low_tier_enemies
+        enemy_pool = Pools.low_tier_enemies
     elif player.stats.level <= 6:
-        enemy_pool = Globals.mid_tier_enemies
-    elif player.stats.level <= 9:
+        enemy_pool = Pools.mid_tier_enemies
+    elif player.stats.Pools <= 9:
         enemy_pool = Globals.high_tier_enemies
     
-    var amount_to_spawn = Globals.level_rng.randi_range(Globals.min_enemies,Globals.max_enemies)
+    var amount_to_spawn = Globals.level_rng.randi_range(Pools.min_enemies,Pools.max_enemies)
     var non_skip_rooms = rooms.filter(func(room):
         return !room.skip
     )
@@ -149,7 +149,10 @@ static func generate_enemies(spawning_tiles: Array, rooms: Array, player: Node):
         var room = valid_rooms[Globals.level_rng.randi_range(0,valid_rooms.size()-1)]
         var tile = room.get_random_valid_tile(valid_tiles,Globals.level_rng)
         var enemy_type = enemy_pool[Globals.level_rng.randi_range(0,enemy_pool.size()-1)]
-        var enemy = EnemyData.new(tile.position,enemy_type,false)
+        
+        var is_sleeping = Globals.level_rng.randi_range(1,Pools.sleep_chance) == 1
+        
+        var enemy = EnemyData.new(tile.position,enemy_type,is_sleeping)
         enemies.append(enemy)
         valid_tiles.erase(tile)
         valid_rooms.erase(room)
@@ -408,7 +411,7 @@ static func convert_ascii_to_tiles(ascii_map: Array, player: Node) -> Array:
                     tile = Tile.new("STAIRS",true,Constants.STAIRS, false, position)
                 "&":
                     tile = Tile.new("FLOOR",true,Constants.FLOOR,false, position)
-                    var enemy = EnemyData.new(position,"goblin", true)
+                    var enemy = EnemyData.new(position,"goblin", false)
                     enemies.append(enemy)
                 Constants.TXT_ARTIFACT:
                     tile = Tile.new("FLOOR", true, Constants.FLOOR, false, position)

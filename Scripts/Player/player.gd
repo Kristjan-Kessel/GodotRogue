@@ -22,7 +22,7 @@ var action_delay_timer = 0.0
 @onready var stats = $Stats
 
 # Commands
-enum CommandType {DEATH, NONE, FIND, MOVE, INVENTORY, HELP, DROP, WEAR_ARMOR, WIELD_WEAPON, USE_ITEM, ATTACK} # For commands that take an argument to execute (ex: direction)
+enum CommandType {DEATH, INSPECT, NONE, FIND, MOVE, INVENTORY, HELP, DROP, WEAR_ARMOR, WIELD_WEAPON, USE_ITEM, ATTACK} # For commands that take an argument to execute (ex: direction)
 var current_command = CommandType.NONE
 
 # Inventory
@@ -60,6 +60,15 @@ func _process(delta: float) -> void:
                 var item = get_item_from_key()
                 if item != null:
                     drop_item.emit(item)
+            return
+        CommandType.INSPECT:
+            if Input.is_action_just_pressed("view_options"):
+                open_inventory.emit("- Select an item to inspect -",inventory)
+            else:	
+                var item = get_item_from_key()
+                if item != null:
+                    var item_info = "%s, %s" % [item.label, item.description]
+                    log_message.emit(item_info)
             return
         CommandType.USE_ITEM:
             if Input.is_action_just_pressed("view_options"):
@@ -208,6 +217,9 @@ func _process(delta: float) -> void:
         elif Input.is_action_just_pressed("command_drop"):
             current_command = CommandType.DROP
             log_message.emit("Choose an item to drop (a-z). press (*) to view options")
+        elif Input.is_action_just_pressed("command_inspect"):
+            current_command = CommandType.INSPECT
+            log_message.emit("Choose an item to inspect (a-z). press (*) to view options")
         elif Input.is_action_just_pressed("command_wear_armor"):
             if armor_item != null:
                 log_message.emit("You're already wearing armor.")
