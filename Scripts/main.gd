@@ -1,6 +1,6 @@
 extends Node2D
 
-const debug_sight = true
+const debug_sight = false
 
 var map_data : Array = []
 @onready var level = $UI/Background/MapLabel
@@ -95,10 +95,10 @@ func new_level():
 
 func render_map():
     var ptile = get_tile(player.position)
-    var max_distance = 99
     
     # Checks for line of sight with enemies
     for enemy in enemies.get_children():
+        var max_distance = 99
         var is_visible = true
         var etile = get_tile(enemy.position)
         connect_tile(etile)
@@ -107,14 +107,15 @@ func render_map():
         for i in range(1, path.size() - 1):
             var tile = get_tile(path[i])
             distance += 1
+            if tile.type == "CORRIDOR":
+                max_distance = 1
+            if distance >= max_distance:
+                is_visible = false
+                break
             if tile.type == "DOOR":
                 is_visible = false
                 break
-            if tile.type == "CORRIDOR":
-                max_distance = 1
-            if distance > max_distance:
-                is_visible = false
-                break
+            
         enemy.is_visible = is_visible || debug_sight
         astar.remove_point(etile.id)
         
@@ -238,7 +239,7 @@ func on_action_taken():
             var is_visible = true
             for point in bypass_path:
                 var ptile = get_tile(point)
-                if ptile.type == "DOOR":
+                if ptile.type == "DOOR" && ptile.entity != player:
                     is_visible = false
                     break
             enemy.can_see_player = is_visible

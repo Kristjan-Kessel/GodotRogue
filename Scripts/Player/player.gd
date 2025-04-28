@@ -209,14 +209,16 @@ func _process(delta: float) -> void:
             current_command = CommandType.DROP
             log_message.emit("Choose an item to drop (a-z). press (*) to view options")
         elif Input.is_action_just_pressed("command_wear_armor"):
-            current_command = CommandType.WEAR_ARMOR
-            log_message.emit("Choose an item to wear as armor (a-z). press (*) to view options")
+            if armor_item != null:
+                log_message.emit("You're already wearing armor.")
+            else:
+                current_command = CommandType.WEAR_ARMOR
+                log_message.emit("Choose an item to wear as armor (a-z). press (*) to view options")
         elif Input.is_action_just_pressed("command_wield_weapon"):
             current_command = CommandType.WIELD_WEAPON
             log_message.emit("Choose an item to wield as a weapon (a-z). press (*) to view options")
         elif Input.is_action_just_pressed("command_take_armor_off"):
             if armor_item != null:
-                inventory.append(armor_item)
                 armor_item = null
                 log_message.emit("Took off armor.")
                 stats.armor_class = 1
