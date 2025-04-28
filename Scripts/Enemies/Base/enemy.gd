@@ -12,13 +12,16 @@ var state = State.IDLE
 var is_visible = true
 var can_see_player = false
 
-func on_turn(path: Array):
+func on_turn(path: Array, bypass_path: Array):
     if state == State.IDLE:
         if can_see_player:
             state = State.ATTACKING
     if state == State.ATTACKING:
         if path.size() > 0:
             enemy_move.emit(path[1], self)
+        else:
+            bypass_path.size() > 0
+            enemy_move.emit(bypass_path[1], self)
 
 func _set_health(hp: int):
     health = hp

@@ -37,7 +37,9 @@ func _ready() -> void:
     var start_weapon = Weapon.new("Dagger","Just a dagger with a damage dice of 6",0,6)
     inventory.append(start_weapon)
     weapon_item = start_weapon
-    inventory.append(Armor.new("Leather armor","Just some leather armor with an armor class of 5",5))
+    var start_armor = Armor.new("Leather armor","Just some leather armor with an armor class of 5",5)
+    inventory.append(start_armor)
+    armor_item = start_armor
  
 func _process(delta: float) -> void:
     if action_delay_timer > 0.0:
@@ -247,7 +249,7 @@ func attack_enemy(enemy: Enemy):
     current_command = CommandType.ATTACK
     var hit = Globals.rng.randi_range(1,20)
     var crit = hit == 20
-    var hit_bonus = weapon_item.bonus_attack + stats.get_attack()
+    var hit_bonus = weapon_item.bonus_attack + stats.get_attack_bonus()
     hit += hit_bonus
     
     if hit>=enemy.armor || crit:

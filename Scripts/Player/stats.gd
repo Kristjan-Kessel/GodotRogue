@@ -5,8 +5,8 @@ signal player_death
 @export var level: int = 1
 @export var max_hp: int = 12
 @export var current_hp: int = 12 : set = _set_current_hp
-@export var strength: int = 16
-@export var armor_class: int = 1
+@export var strength: int = 14
+@export var armor_class: int = 5
 @export var gold: int = 0
 @export var exp: int = 0 : set = _set_current_exp
 @export var player_lvl: int = 1
@@ -34,5 +34,5 @@ func _set_current_hp(new_hp):
     if current_hp == 0:
         player_death.emit()
     
-func get_attack():
+func get_attack_bonus():
     return (strength-10)/2

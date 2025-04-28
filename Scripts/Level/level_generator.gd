@@ -94,82 +94,51 @@ static func generate_level(player: Node) -> Array:
     
     select_and_generate_corridors(map,room_grid,room_list)
     
-    # Spawn enemies and items
-    var enemies = []
     generate_loot(spawning_tiles,player)
+    var enemies = generate_enemies(spawning_tiles,player)
     return [map, enemies, room_list]
 
-static var low_tier_loot = [
-    Weapon.new("Shortsword", "a short sword with a damage dice of 8", 1, 8),
-    Weapon.new("Dagger +2", "Grants +2 to attacks with a damage dice of 6", 2, 6),  
-    Armor.new("Chainmail","Has an armor class of 6",6),
-    Potion.new(),
-    Potion.new(),
-    Potion.new(),
-    Potion.new(),
-    StrengthPotion.new(),
-    Gold.new(),
-    Gold.new(),
-    Gold.new(),
-    Gold.new(),
-    Gold.new()
-    ]
-static var mid_tier_loot = [
-    Weapon.new("Longsword +1", "Grants +1 to attacks with a damage dice of 10", 1, 10), 
-    Armor.new("Plate armor","Has an armor class of 8",8),
-    Potion.new(),
-    Potion.new(),
-    Potion.new(),
-    Potion.new(),
-    StrengthPotion.new(),
-    Gold.new(),
-    Gold.new(),
-    Gold.new(),
-    Gold.new(),
-    Gold.new()
-    ]
-static var high_tier_loot = [
-    Weapon.new("Greatsword +2", "Grants +2 to attacks with a damage dice of 12", 2, 12), 
-    Armor.new("Heavyplate armor","Has an armor class of 10",10),
-    Potion.new(),
-    Potion.new(),
-    Potion.new(),
-    Potion.new(),
-    StrengthPotion.new(),
-    Gold.new(),
-    Gold.new(),
-    Gold.new(),
-    Gold.new(),
-    Gold.new()
-    ]
-static var fallback_pool = [
-    Potion.new(),
-    Gold.new(),
-    Gold.new()
-    ]
-
-const min_loot = 5
-const max_loot = 8
-
-static func generate_loot(valid_tiles: Array, player: Node):
+static func generate_loot(spawning_tiles: Array, player: Node):
     var loot_pool
+    var valid_tiles = spawning_tiles.duplicate()
     if player.stats.level <= 3:
-        loot_pool = low_tier_loot
+        loot_pool = Globals.low_tier_loot
     elif player.stats.level <= 6:
-        loot_pool = mid_tier_loot
+        loot_pool = Globals.mid_tier_loot
     elif player.stats.level <= 9:
-        loot_pool = high_tier_loot
+        loot_pool = Globals.high_tier_loot
     
-    var amount_to_spawn = Globals.level_rng.randi_range(min_loot,max_loot)
+    var amount_to_spawn = Globals.level_rng.randi_range(Globals.min_loot,Globals.max_loot)
     for i in range(amount_to_spawn):
         if loot_pool.size() == 0:
-            loot_pool = fallback_pool.duplicate()
+            loot_pool = Globals.fallback_pool.duplicate()
         var tile = valid_tiles[Globals.level_rng.randi_range(0,valid_tiles.size()-1)]
         valid_tiles.erase(tile)
         var item = loot_pool[Globals.level_rng.randi_range(0,loot_pool.size()-1)]
         tile.item = item
         loot_pool.erase(item)
+
+static func generate_enemies(spawning_tiles: Array, player: Node):
+    var enemy_pool
+    var enemies = []
+    var valid_tiles = spawning_tiles.duplicate()
+    if player.stats.level <= 3:
+        enemy_pool = Globals.low_tier_enemies
+    elif player.stats.level <= 6:
+        enemy_pool = Globals.mid_tier_enemies
+    elif player.stats.level <= 9:
+        enemy_pool = Globals.high_tier_enemies
     
+    var amount_to_spawn = Globals.level_rng.randi_range(Globals.min_enemies,Globals.max_enemies)
+    for i in range(amount_to_spawn):
+        var tile = valid_tiles[Globals.level_rng.randi_range(0,valid_tiles.size()-1)]
+        valid_tiles.erase(tile)
+        var enemy_type = enemy_pool[Globals.level_rng.randi_range(0,enemy_pool.size()-1)]
+        var enemy = EnemyData.new(tile.position,enemy_type,false)
+        enemies.append(enemy)
+    
+    return enemies
+
 static func select_and_generate_corridors(map: Array, room_grid: Array, room_list: Array):
     var orphan_rooms = Array(room_list)
     var current_room = room_list[Globals.level_rng.randi_range(0,room_list.size()-1)]
@@ -422,7 +391,7 @@ static func convert_ascii_to_tiles(ascii_map: Array, player: Node) -> Array:
                     tile = Tile.new("STAIRS",true,Constants.STAIRS, false, position)
                 "&":
                     tile = Tile.new("FLOOR",true,Constants.FLOOR,false, position)
-                    var enemy = EnemyData.new(position,"res://Scripts/Enemies/goblin.tscn", true)
+                    var enemy = EnemyData.new(position,"goblin", true)
                     enemies.append(enemy)
                 Constants.TXT_ARTIFACT:
                     tile = Tile.new("FLOOR", true, Constants.FLOOR, false, position)

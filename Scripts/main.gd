@@ -11,6 +11,7 @@ var map_data : Array = []
 var log_message = ""
 
 var astar = AStar2D.new()
+var astar_bypass = AStar2D.new()
 
 @export var turn = 0
 
@@ -48,9 +49,11 @@ func update_astar():
 
 func connect_tile(tile):
     astar.add_point(tile.id, tile.position)
+    astar_bypass.add_point(tile.id, tile.position)
     for ntile in get_tile_neighbours(tile):
         if ntile != null && ntile.is_walkable && astar.has_point(ntile.id):
             astar.connect_points(tile.id, ntile.id)
+            astar_bypass.connect_points(tile.id,ntile.id)
 
 var enemy_cache = {}
 func spawn_enemies_from_list(enemy_list):
@@ -216,10 +219,10 @@ func move_player(new_position: Vector2) -> bool:
     return moved
 
 func on_action_taken():
-    print("turn: "+str(turn))
     player.stats.turns_until_regen -= 1
     var player_tile = get_tile(player.position)
     connect_tile(player_tile)
+    
     for enemy in enemies.get_children():
         var tile = get_tile(enemy.position)
         if enemy.health <= 0:
@@ -231,15 +234,16 @@ func on_action_taken():
         else:
             connect_tile(tile)
             # Check for line of sight with player
-            var path = astar.get_point_path(tile.id, player_tile.id)
+            var bypass_path = astar_bypass.get_point_path(tile.id, player_tile.id)
             var is_visible = true
-            for point in path:
+            for point in bypass_path:
                 var ptile = get_tile(point)
-                if ptile.type == "DOOR" && ptile.entity != player:
+                if ptile.type == "DOOR":
                     is_visible = false
                     break
             enemy.can_see_player = is_visible
-            enemy.on_turn(path)
+            var path = astar.get_point_path(tile.id, player_tile.id)
+            enemy.on_turn(path,bypass_path)
     
     render_map()
     turn += 1
