@@ -409,9 +409,13 @@ static func convert_ascii_to_tiles(ascii_map: Array, player: Node) -> Array:
                     tile.item = Gold.new()
                 Constants.TXT_STAIRS:
                     tile = Tile.new("STAIRS",true,Constants.STAIRS, false, position)
-                "&":
+                "g":
                     tile = Tile.new("FLOOR",true,Constants.FLOOR,false, position)
                     var enemy = EnemyData.new(position,"goblin", false)
+                    enemies.append(enemy)
+                "i":
+                    tile = Tile.new("FLOOR",true,Constants.FLOOR,false, position)
+                    var enemy = EnemyData.new(position,"icemonster", false)
                     enemies.append(enemy)
                 Constants.TXT_ARTIFACT:
                     tile = Tile.new("FLOOR", true, Constants.FLOOR, false, position)

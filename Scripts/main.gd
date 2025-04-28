@@ -190,6 +190,12 @@ func move_enemy(new_position: Vector2, enemy: Enemy):
         astar.remove_point(point_id)
 
 func move_player(new_position: Vector2) -> bool:
+    
+    if player.stunned:
+        log_message = "You are stunned. [continue]"
+        render_map()
+        return false
+    
     log_message = ""
     
     new_position.x = clamp(new_position.x, 0, Globals.map_width - 1)

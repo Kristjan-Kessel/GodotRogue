@@ -30,6 +30,8 @@ var inventory = []
 var armor_item = null
 var weapon_item = null
 
+var stunned = false
+
 func _ready() -> void:
     ascii = Constants.PLAYER
     
@@ -45,6 +47,14 @@ func _process(delta: float) -> void:
     if action_delay_timer > 0.0:
         action_delay_timer -= delta
         return
+    
+    if stunned:
+        if Input.is_action_just_pressed("continue"):
+                current_command = CommandType.MOVE
+                log_message.emit("")
+                stunned = false
+                action_taken.emit()
+                return
     
     if Input.is_action_just_pressed("command_cancel"):
         current_command = CommandType.NONE

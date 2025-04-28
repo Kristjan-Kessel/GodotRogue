@@ -42,10 +42,11 @@ func attack_player(player: Node) -> String:
             result = "The %s has injured you." % label
         if player.stats.current_hp == 0:
             result = "The %s has killed you." % label
-        attack_effects(player)
+            return result
+        result = attack_effects(player,result)
     else:
         result = "The %s misses you." % label
     return result
 
-func attack_effects(player: Node):
-    pass
+func attack_effects(player: Node, message: String) -> String:
+    return message
