@@ -1,5 +1,9 @@
 extends Node
 
+# Map Variables
+const map_width: int = 3*35
+const map_height: int = 3*8
+
 # Constant variables
 const INVENTORY_CHARS = "abcfghijklmnoprstuvxyz" # Chars to select an item in the inventory. some chars overlap with commands so remove those.
 

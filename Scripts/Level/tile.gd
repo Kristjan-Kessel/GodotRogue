@@ -17,7 +17,7 @@ func _init(tile_type: String, _is_walkable: bool, _ascii: String, _important: bo
     ascii = _ascii
     is_important = _important
     position = _position
-    id = position.y * Globals.map_width + position.x
+    id = position.y * Constants.map_width + position.x
     
 func is_interesting() -> bool:
     return is_important || item != null || entity != null

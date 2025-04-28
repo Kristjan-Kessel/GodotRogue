@@ -57,8 +57,8 @@ const max_loot = 12
 
 # Enemy spawning pools
 static var low_tier_enemies = ["goblin","snake","emu"]
-static var mid_tier_enemies = ["hobgoblin","centaur","icemonster"]
-static var high_tier_enemies = ["hobgoblin","centaur","icemonster"]
+static var mid_tier_enemies = ["orc","centaur","icemonster"]
+static var high_tier_enemies = ["drake","troll","banshee"]
 
 # chance for enemies to be sleeping when spawned, 1/sleep_chance
 const sleep_chance = 10

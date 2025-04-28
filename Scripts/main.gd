@@ -19,9 +19,9 @@ func _ready():
     Globals.initialize_randomness()
     print("Using seed: ", Globals.rng_seed)
     ui.update_stats(player, turn)
-    #new_level()
+    new_level()
     #test_level("final.txt")
-    test_level("test.txt")
+    #test_level("test.txt")
 
 func get_tile(position: Vector2) -> Tile:
     if position.y >= 0 and position.y < map_data.size():
@@ -174,8 +174,8 @@ func render_inventory(text: String, items: Array):
     level.text = map_str
 
 func move_enemy(new_position: Vector2, enemy: Enemy):
-    new_position.x = clamp(new_position.x, 0, Globals.map_width - 1)
-    new_position.y = clamp(new_position.y, 0, Globals.map_height - 1)
+    new_position.x = clamp(new_position.x, 0, Constants.map_width - 1)
+    new_position.y = clamp(new_position.y, 0, Constants.map_height - 1)
     var target_tile = get_tile(new_position)
     if target_tile.is_walkable:
         if target_tile.entity == null:
@@ -198,8 +198,8 @@ func move_player(new_position: Vector2) -> bool:
     
     log_message = ""
     
-    new_position.x = clamp(new_position.x, 0, Globals.map_width - 1)
-    new_position.y = clamp(new_position.y, 0, Globals.map_height - 1)
+    new_position.x = clamp(new_position.x, 0, Constants.map_width - 1)
+    new_position.y = clamp(new_position.y, 0, Constants.map_height - 1)
     var moved = false
     
     var target_tile = get_tile(new_position)

@@ -20,9 +20,9 @@ static func generate_level(player: Node) -> Array:
     # To track floor tiles that can support items and enemies (Ex: stairs and player tile cannot.)
     var spawning_tiles = []
 
-    for y in range(Globals.map_height):
+    for y in range(Constants.map_height):
         var row = []
-        for x in range(Globals.map_width):
+        for x in range(Constants.map_width):
             row.append(empty_tile);
         map.append(row)
     
@@ -50,10 +50,10 @@ static func generate_level(player: Node) -> Array:
     valid_rooms[Globals.level_rng.randi_range(0,valid_rooms.size()-1)].is_exit_room = true
     
     for room in room_list:
-        var max_width = Globals.map_width/3
-        var max_height = Globals.map_height/3
-        var start_x = Globals.map_width/3*room.grid_position.x
-        var start_y = Globals.map_height/3*room.grid_position.y
+        var max_width = Constants.map_width/3
+        var max_height = Constants.map_height/3
+        var start_x = Constants.map_width/3*room.grid_position.x
+        var start_y = Constants.map_height/3*room.grid_position.y
         
         if room.skip:
             room.position.x = Globals.level_rng.randi_range(start_x,start_x+max_width-1)
@@ -373,16 +373,16 @@ static func get_ascii_from_file(file_name: String) -> Array:
 static func convert_ascii_to_tiles(ascii_map: Array, player: Node) -> Array:
     var tile_map = []
     var empty_tile = Tile.new("EMPTY", false, Constants.EMPTY, false, Vector2(-1,-1))
-    for y in range(Globals.map_height):
+    for y in range(Constants.map_height):
         var row = []
-        for x in range(Globals.map_width):
+        for x in range(Constants.map_width):
             row.append(empty_tile);
         tile_map.append(row)
     
     var ascii_width = ascii_map[0].size()
     var ascii_height = ascii_map.size()
-    var offset_x = int((Globals.map_width - ascii_width) / 2)
-    var offset_y = int((Globals.map_height - ascii_height) / 2)
+    var offset_x = int((Constants.map_width - ascii_width) / 2)
+    var offset_y = int((Constants.map_height - ascii_height) / 2)
     
     var enemies = []
     for y in range(ascii_map.size()):
@@ -416,6 +416,10 @@ static func convert_ascii_to_tiles(ascii_map: Array, player: Node) -> Array:
                 "i":
                     tile = Tile.new("FLOOR",true,Constants.FLOOR,false, position)
                     var enemy = EnemyData.new(position,"icemonster", false)
+                    enemies.append(enemy)
+                "d":
+                    tile = Tile.new("FLOOR",true,Constants.FLOOR,false, position)
+                    var enemy = EnemyData.new(position,"drake", false)
                     enemies.append(enemy)
                 Constants.TXT_ARTIFACT:
                     tile = Tile.new("FLOOR", true, Constants.FLOOR, false, position)
