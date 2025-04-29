@@ -347,7 +347,7 @@ func _on_player_open_help_menu() -> void:
 func _on_player_use_stairs() -> void:
     var tile = get_tile(player.position)
     if tile.type == "STAIRS":
-        player.stats.level += 3
+        player.stats.level += 1
         new_level()
         ui.update_stats(player,turn)
         render_map()
@@ -359,41 +359,42 @@ func _on_player_win() -> void:
 
 
 func _on_player_open_symbols_menu() -> void:
-    const SYMBOL_WIDTH = 3
-    const NAME_WIDTH = 12
-    const COLUMNS = 2
+    const CELL_WIDTH = 55
 
     var symbols = [
-        [Constants.PLAYER,    "the hero"],
-        [Constants.FLOOR,     "the floor"],
-        [Constants.CORRIDOR,  "a passage"],
-        [Constants.WALL_V,      "a wall"],
-        [Constants.WALL_H,   "a wall"],
-        [Constants.WALL_CORNER_TR,   "a wall"],
-        [Constants.WALL_CORNER_TL,   "a wall"],
-        [Constants.WALL_CORNER_BR,   "a wall"],
-        [Constants.WALL_CORNER_BL,   "a wall"],
-        [Constants.DOOR,      "a door"],
-        [Constants.ITEM,      "an item"],
-        [Constants.GOLD,      "some gold"],
-        [Constants.STAIRS,    "a stair case"],
-        [Constants.ARTIFACT,  "the artifact"],
+        [Constants.PLAYER, "the hero"],
+        [Constants.ARTIFACT, "the artifact"],
+        [Constants.FLOOR, "the floor"],
+        [Constants.STAIRS, "a stair case"],
+        [Constants.WALL_V, "a wall"],
+        [Constants.WALL_H, "a wall"],
+        [Constants.WALL_CORNER_TL, "a corner"],
+        [Constants.WALL_CORNER_BR, "a corner"],
+        [Constants.WALL_CORNER_TR, "a corner"],
+        [Constants.WALL_CORNER_BL, "a corner"],
+        [Constants.CORRIDOR, "a passage"],
+        [Constants.DOOR, "a door"],
+        [Constants.WEAPON, "a weapon"],
+        [Constants.ARMOR, "a piece of armor"],
+        [Constants.HEALTH_POTION, "a potion of healing"],
+        [Constants.STRENGTH_POTION, "a potion of strength"],
+        [Constants.SCROLL, "a scroll"],
+        [Constants.GOLD, "some gold"],
         ["a-z","different monsters"]
     ]
 
     var map_str = ""
-    var rows = ceil(float(symbols.size()) / COLUMNS)
-
-    for i in range(rows):
-        var row_str := ""
-        for j in range(COLUMNS):
-            var index = i + j * rows
-            if index < symbols.size():
-                var symbol = symbols[index][0]
-                var name = symbols[index][1]
-                var cell = str(symbol, ": ").rpad(SYMBOL_WIDTH) + name.rpad(NAME_WIDTH)
-                row_str += cell
-        map_str += row_str + "\n"
+    var i = 0
+    while i < symbols.size():
+        var row = ""
+        print(i)
+        var left = "%s: %s" % [symbols[i][0],symbols[i][1]]
+        var right = ""
+        if i+1 < symbols.size():
+            right = "%s: %s" % [symbols[i+1][0],symbols[i+1][1]]
+        row = left.rpad(CELL_WIDTH, " ") + right + "\n"
+        map_str += row
+        i+=2
 
     ui.set_stats_message("- Press space to continue -")
     level.text = map_str

@@ -17,7 +17,9 @@ static var low_tier_loot = [
     Gold.new(),
     Gold.new(),
     Gold.new(),
-    Gold.new()
+    Gold.new(),
+    Scroll.new(),
+    Scroll.new()
     ]
 static var mid_tier_loot = [
     Weapon.new("Longsword +1", "Grants +1 to attacks with a damage dice of 10", 1, 10), 
@@ -31,7 +33,9 @@ static var mid_tier_loot = [
     Gold.new(),
     Gold.new(),
     Gold.new(),
-    Gold.new()
+    Gold.new(),
+    Scroll.new(),
+    Scroll.new()
     ]
 static var high_tier_loot = [
     Weapon.new("Greatsword +2", "Grants +2 to attacks with a damage dice of 12", 2, 12), 
@@ -44,7 +48,9 @@ static var high_tier_loot = [
     Gold.new(),
     Gold.new(),
     Gold.new(),
-    Gold.new()
+    Gold.new(),
+    Scroll.new(),
+    Scroll.new()
     ]
 static var fallback_pool = [
     Potion.new(),
