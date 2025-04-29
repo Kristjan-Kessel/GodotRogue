@@ -357,3 +357,39 @@ const WIN_SCENE_PATH := "res://Scenes/WinScreen.tscn"
 func _on_player_win() -> void:
     Globals.final_gold = player.stats.gold
     get_tree().change_scene_to_file(WIN_SCENE_PATH)
+
+
+func _on_player_open_symbols_menu() -> void:
+    const SYMBOL_WIDTH = 3
+    const NAME_WIDTH = 12
+    const COLUMNS = 2
+
+    var symbols = [
+        [Constants.PLAYER,    "Player"],
+        [Constants.FLOOR,     "Floor"],
+        [Constants.CORRIDOR,  "Corridor"],
+        [Constants.WALL,      "Wall"],
+        [Constants.CEILING,   "Ceiling"],
+        [Constants.DOOR,      "Door"],
+        [Constants.ITEM,      "Item"],
+        [Constants.GOLD,      "Gold"],
+        [Constants.STAIRS,    "Stairs"],
+        [Constants.ARTIFACT,  "Artifact"]
+    ]
+
+    var map_str = ""
+    var rows = ceil(float(symbols.size()) / COLUMNS)
+
+    for i in range(rows):
+        var row_str := ""
+        for j in range(COLUMNS):
+            var index = i + j * rows
+            if index < symbols.size():
+                var symbol = symbols[index][0]
+                var name = symbols[index][1]
+                var cell = str(symbol, ": ").rpad(SYMBOL_WIDTH) + name.rpad(NAME_WIDTH)
+                row_str += cell
+        map_str += row_str + "\n"
+
+    ui.set_stats_message("- Press space to continue -")
+    level.text = map_str

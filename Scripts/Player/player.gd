@@ -5,6 +5,7 @@ signal player_move(new_position)
 signal log_message(new_message)
 signal command_find(direction)
 signal open_inventory(text, items)
+signal open_symbols_menu()
 signal render_map()
 signal drop_item(item)
 signal open_help_menu()
@@ -24,7 +25,7 @@ var action_delay_timer = 0.0
 @onready var stats = $Stats
 
 # Commands
-enum CommandType {DEATH, INSPECT, NONE, FIND, MOVE, INVENTORY, HELP, DROP, WEAR_ARMOR, WIELD_WEAPON, USE_ITEM, ATTACK} # For commands that take an argument to execute (ex: direction)
+enum CommandType {EXIT, DEATH, INSPECT, SYMBOLS, NONE, FIND, MOVE, INVENTORY, HELP, DROP, WEAR_ARMOR, WIELD_WEAPON, USE_ITEM, ATTACK} # For commands that take an argument to execute (ex: direction)
 var current_command = CommandType.NONE
 
 # Inventory
@@ -167,6 +168,13 @@ func _process(delta: float) -> void:
             if Input.is_action_just_pressed("continue"):
                 current_command = CommandType.NONE
                 render_map.emit()
+        CommandType.EXIT:
+            if Input.is_action_just_pressed("continue"):
+                get_tree().quit()
+        CommandType.SYMBOLS:
+            if Input.is_action_just_pressed("continue"):
+                current_command = CommandType.NONE
+                render_map.emit()
         CommandType.MOVE:
             var new_direction = Vector2.ZERO
         
@@ -261,9 +269,15 @@ func _process(delta: float) -> void:
         elif Input.is_action_just_pressed("command_help"):
             current_command = CommandType.HELP
             open_help_menu.emit()
+        elif Input.is_action_just_pressed("command_symbols"):
+            current_command = CommandType.SYMBOLS
+            open_symbols_menu.emit()
         elif Input.is_action_just_pressed("command_stairs"):
             use_stairs.emit()
             delay_actions(0.1)
+        elif Input.is_action_just_pressed("command_exit"):
+            current_command = CommandType.EXIT
+            log_message.emit("Are you sure you want to exit? [continue] [cancel]")
 
 func delay_actions(delay: float):
     action_delay_timer = delay
@@ -300,7 +314,6 @@ func get_item_from_key() -> Item:
             render_map.emit()
             if index < inventory.size():
                 var item = inventory[index]
-                #drop_item.emit(item)
                 return item
             else:
                 log_message.emit("Invalid item.")

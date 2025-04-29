@@ -7,6 +7,6 @@ func _ready() -> void:
     armor = 2
     attack = 20
     label = "Troll"
-    ascii = "[color=#00ad5f]t[/color]"
+    ascii = Constants.TROLL
     min_exp = 2
     max_exp = 3

@@ -7,6 +7,6 @@ func _ready() -> void:
     armor = 3
     attack = 8
     label = "Snake"
-    ascii = "[color=#41a61f]s[/color]"
+    ascii = Constants.SNAKE
     min_exp = 1
     max_exp = 2

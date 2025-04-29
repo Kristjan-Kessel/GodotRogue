@@ -7,6 +7,6 @@ func _ready() -> void:
     armor = 15
     attack = 30
     label = "Banshee"
-    ascii = "[color=#adffff]b[/color]"
+    ascii = Constants.BANSHEE
     min_exp = 1
     max_exp = 3

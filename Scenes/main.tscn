@@ -69,6 +69,7 @@ script = ExtResource("5_pbw6q")
 [connection signal="log_message" from="Player" to="." method="_on_player_log_message"]
 [connection signal="open_help_menu" from="Player" to="." method="_on_player_open_help_menu"]
 [connection signal="open_inventory" from="Player" to="." method="_on_player_open_inventory"]
+[connection signal="open_symbols_menu" from="Player" to="." method="_on_player_open_symbols_menu"]
 [connection signal="player_death" from="Player" to="." method="_on_player_death"]
 [connection signal="player_move" from="Player" to="." method="_on_player_move"]
 [connection signal="render_map" from="Player" to="." method="_on_player_render_map"]

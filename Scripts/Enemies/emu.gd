@@ -7,6 +7,6 @@ func _ready() -> void:
     armor = 1
     attack = 10
     label = "Emu"
-    ascii = "[color=#c9ab79]e[/color]"
+    ascii = Constants.EMU
     min_exp = 1
     max_exp = 1
