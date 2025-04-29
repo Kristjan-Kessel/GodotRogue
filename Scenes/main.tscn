@@ -30,7 +30,7 @@ anchor_mode = 0
 [node name="Background" type="ColorRect" parent="UI"]
 layout_mode = 2
 size_flags_vertical = 3
-color = Color(0.140447, 0.140447, 0.140447, 1)
+color = Color(0, 0, 0, 1)
 
 [node name="MapLabel" type="RichTextLabel" parent="UI/Background"]
 layout_mode = 1

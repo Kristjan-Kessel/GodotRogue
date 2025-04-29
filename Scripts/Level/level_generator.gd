@@ -336,10 +336,18 @@ static func generate_room(map: Array, room: Room, spawning_tiles: Array):
         for x in range(room.size.x):
             var position = Vector2(room.position.x+x,room.position.y+y)
             var tile
-            if y == 0 || y==room.size.y-1:
-                tile = Tile.new("WALL", false, Constants.CEILING, false, position)
-            elif x == 0 || x==room.size.x-1:
-                tile = Tile.new("WALL", false, Constants.WALL, false, position)
+            if y==0 && x==0:
+                tile = Tile.new("WALL", false, Constants.WALL_CORNER_TL, false, position)
+            elif y==0 && x==room.size.x-1:
+                tile = Tile.new("WALL", false, Constants.WALL_CORNER_TR, false, position)
+            elif y==room.size.y-1 && x==0:
+                tile = Tile.new("WALL", false, Constants.WALL_CORNER_BL, false, position)
+            elif y==room.size.y-1 && x==room.size.x-1:
+                tile = Tile.new("WALL", false, Constants.WALL_CORNER_BR, false, position)
+            elif y==0 || y==room.size.y-1:
+                tile = Tile.new("WALL", false, Constants.WALL_H, false, position)
+            elif x==0 || x==room.size.x-1:
+                tile = Tile.new("WALL", false, Constants.WALL_V, false, position)
             else:
                 tile = Tile.new("FLOOR", true, Constants.FLOOR, false, position)
                 spawning_tiles.append(tile)
@@ -370,8 +378,38 @@ static func get_ascii_from_file(file_name: String) -> Array:
         print("File does not exist: " + path)
     return result
 
+static func get_wall_ascii(ascii_map: Array, x: int, y: int):
+    var left = false
+    var right = false
+    var top = false
+    var bottom = false
+    
+    if y != 0:
+        top = ascii_map[y-1][x].type == "WALL" || ascii_map[y-1][x].type == "DOOR"
+    if x != 0:
+        right = ascii_map[y][x-1].type == "WALL" || ascii_map[y][x-1].type == "DOOR"
+
+    left = ascii_map[y][x+1].type == "WALL" || ascii_map[y][x+1].type == "DOOR"
+    bottom = ascii_map[y+1][x].type == "WALL" || ascii_map[y+1][x].type == "DOOR"
+    
+    if top && bottom:
+        return Constants.WALL_V
+    elif left && right:
+        return Constants.WALL_H
+    elif top && right:
+        return Constants.WALL_CORNER_BR
+    elif top && left:
+        return Constants.WALL_CORNER_BL
+    elif bottom && right:
+        return Constants.WALL_CORNER_TR
+    elif bottom && left:
+        return Constants.WALL_CORNER_TL
+    else:
+        return "F"
+    
 static func convert_ascii_to_tiles(ascii_map: Array, player: Node) -> Array:
     var tile_map = []
+    var walls = []
     var empty_tile = Tile.new("EMPTY", false, Constants.EMPTY, false, Vector2(-1,-1))
     for y in range(Constants.map_height):
         var row = []
@@ -391,9 +429,8 @@ static func convert_ascii_to_tiles(ascii_map: Array, player: Node) -> Array:
             var position = Vector2(x+offset_x,y+offset_y)
             match ascii_map[y][x]:
                 Constants.TXT_WALL:
-                    tile = Tile.new("WALL", false, Constants.WALL, false, position)
-                Constants.TXT_CEILING:
-                    tile = Tile.new("WALL", false, Constants.CEILING,false, position)
+                    tile = Tile.new("WALL", false, "", false, position)
+                    walls.append(tile)
                 Constants.TXT_FLOOR:
                     tile = Tile.new("FLOOR", true, Constants.FLOOR,false, position)
                 Constants.TXT_DOOR:
@@ -427,4 +464,8 @@ static func convert_ascii_to_tiles(ascii_map: Array, player: Node) -> Array:
                 _:
                     tile = Tile.new("EMPTY", false,Constants.EMPTY, false, position)
             tile_map[y+offset_y][x+offset_x] = tile
+    
+    for wall in walls:
+        wall.ascii = get_wall_ascii(tile_map,wall.position.x,wall.position.y)
+    
     return [tile_map,enemies]

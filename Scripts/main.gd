@@ -9,7 +9,6 @@ var map_data : Array = []
 @onready var enemies = $Enemies
 
 var log_message = ""
-
 var astar = AStar2D.new()
 var astar_bypass = AStar2D.new()
 
@@ -81,8 +80,8 @@ func spawn_enemies_from_list(enemy_list):
 func test_level(file: String):
     var level_data = LevelGenerator.get_level_from_file(file,player)
     map_data = level_data[0]
-    spawn_enemies_from_list(level_data[1])
     update_astar()
+    spawn_enemies_from_list(level_data[1])
     reveal_room(get_tile(player.position))
     render_map()
 
@@ -365,16 +364,21 @@ func _on_player_open_symbols_menu() -> void:
     const COLUMNS = 2
 
     var symbols = [
-        [Constants.PLAYER,    "Player"],
-        [Constants.FLOOR,     "Floor"],
-        [Constants.CORRIDOR,  "Corridor"],
-        [Constants.WALL,      "Wall"],
-        [Constants.CEILING,   "Ceiling"],
-        [Constants.DOOR,      "Door"],
-        [Constants.ITEM,      "Item"],
-        [Constants.GOLD,      "Gold"],
-        [Constants.STAIRS,    "Stairs"],
-        [Constants.ARTIFACT,  "Artifact"]
+        [Constants.PLAYER,    "the hero"],
+        [Constants.FLOOR,     "the floor"],
+        [Constants.CORRIDOR,  "a passage"],
+        [Constants.WALL_V,      "a wall"],
+        [Constants.WALL_H,   "a wall"],
+        [Constants.WALL_CORNER_TR,   "a wall"],
+        [Constants.WALL_CORNER_TL,   "a wall"],
+        [Constants.WALL_CORNER_BR,   "a wall"],
+        [Constants.WALL_CORNER_BL,   "a wall"],
+        [Constants.DOOR,      "a door"],
+        [Constants.ITEM,      "an item"],
+        [Constants.GOLD,      "some gold"],
+        [Constants.STAIRS,    "a stair case"],
+        [Constants.ARTIFACT,  "the artifact"],
+        ["a-z","different monsters"]
     ]
 
     var map_str = ""
