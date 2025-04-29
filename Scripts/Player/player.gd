@@ -9,6 +9,7 @@ signal render_map()
 signal drop_item(item)
 signal open_help_menu()
 signal use_stairs()
+signal player_death()
 
 # Movement variables
 var move_direction = Vector2.ZERO
@@ -47,6 +48,10 @@ func _process(delta: float) -> void:
     if action_delay_timer > 0.0:
         action_delay_timer -= delta
         return
+    
+    if current_command == CommandType.DEATH:
+        if Input.is_action_just_pressed("continue"):
+            player_death.emit()
     
     if stunned:
         if Input.is_action_just_pressed("continue"):

@@ -335,8 +335,9 @@ func _on_player_drop_item(item: Variant) -> void:
     
     render_map()
 
-func _on_stats_player_death() -> void:
-    pass
+const LOSE_SCENE_PATH := "res://Scenes/LoseScreen.tscn"
+func _on_player_death() -> void:
+    get_tree().change_scene_to_file(LOSE_SCENE_PATH)
 
 func _on_player_open_help_menu() -> void:
     var file = FileAccess.open("res://Assets/help.txt", FileAccess.READ)

@@ -41,7 +41,8 @@ func attack_player(player: Node) -> String:
         else:
             result = "The %s has injured you." % label
         if player.stats.current_hp == 0:
-            result = "The %s has killed you." % label
+            result = "The %s has killed you. [continue]" % label
+            Globals.cause_of_death = "Killed by %s" % label
             return result
         result = attack_effects(player,result)
     else:

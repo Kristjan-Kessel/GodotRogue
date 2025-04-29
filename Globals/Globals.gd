@@ -2,6 +2,7 @@ extends Node
 
 
 var player_name = ""
+var cause_of_death = ""
 
 var rng_seed: int = -1
 var rng: RandomNumberGenerator = RandomNumberGenerator.new()

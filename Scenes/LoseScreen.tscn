@@ -1,0 +1,108 @@
+[gd_scene load_steps=4 format=3 uid="uid://debwo6uhpjhfs"]
+
+[ext_resource type="Script" uid="uid://noutmjkedt0q" path="res://Scenes/lose_screen.gd" id="1_ldcug"]
+[ext_resource type="FontFile" uid="uid://cqu63ixffio5h" path="res://Assets/CascadiaMono.ttf" id="2_5l33y"]
+
+[sub_resource type="Theme" id="Theme_qdjbu"]
+default_font = ExtResource("2_5l33y")
+default_font_size = 20
+
+[node name="LoseScreen" type="Node2D"]
+script = ExtResource("1_ldcug")
+
+[node name="UI" type="VBoxContainer" parent="."]
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_right = 1280.0
+offset_bottom = 720.0
+grow_horizontal = 2
+
+[node name="Camera2D" type="Camera2D" parent="UI"]
+anchor_mode = 0
+
+[node name="Background" type="ColorRect" parent="UI"]
+layout_mode = 2
+size_flags_vertical = 3
+color = Color(0.140447, 0.140447, 0.140447, 1)
+
+[node name="VBoxContainer" type="VBoxContainer" parent="UI/Background"]
+layout_mode = 1
+anchors_preset = 14
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+offset_top = -26.0
+offset_bottom = 26.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="RIP" type="RichTextLabel" parent="UI/Background/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 2
+theme = SubResource("Theme_qdjbu")
+bbcode_enabled = true
+text = "rest
+in peace
+
+"
+fit_content = true
+scroll_active = false
+autowrap_mode = 0
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="PlayerName" type="RichTextLabel" parent="UI/Background/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 2
+theme = SubResource("Theme_qdjbu")
+text = "Jann"
+fit_content = true
+scroll_active = false
+autowrap_mode = 0
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="CauseOfDeath" type="RichTextLabel" parent="UI/Background/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 2
+theme = SubResource("Theme_qdjbu")
+text = "Killed by chicken jockey
+"
+fit_content = true
+scroll_active = false
+autowrap_mode = 0
+horizontal_alignment = 1
+
+[node name="RIP2" type="RichTextLabel" parent="UI/Background/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 2
+theme = SubResource("Theme_qdjbu")
+bbcode_enabled = true
+text = "
+"
+fit_content = true
+scroll_active = false
+autowrap_mode = 0
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="DayMonth" type="RichTextLabel" parent="UI/Background/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 2
+theme = SubResource("Theme_qdjbu")
+text = "15. May"
+fit_content = true
+scroll_active = false
+autowrap_mode = 0
+horizontal_alignment = 1
+
+[node name="Year" type="RichTextLabel" parent="UI/Background/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 2
+theme = SubResource("Theme_qdjbu")
+text = "2025"
+fit_content = true
+scroll_active = false
+autowrap_mode = 0
+horizontal_alignment = 1
