@@ -14,6 +14,6 @@ func _ready() -> void:
     var day = current_date.day
     var month = current_date.month
     var month_name = ["", "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"][month]
-    daymonth.text = str(day) + ". " + month_name.to_lower()
+    daymonth.text = str(day) + ". " + month_name
 
     year.text = str(current_date.year)

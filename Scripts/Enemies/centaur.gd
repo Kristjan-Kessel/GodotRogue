@@ -5,7 +5,7 @@ extends Enemy
 func _ready() -> void:
     health = 20
     armor = 3
-    attack = 12
+    attack = 14
     label = "Centaur"
     ascii = "[color=#632d01]c[/color]"
     min_exp = 2

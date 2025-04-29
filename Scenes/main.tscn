@@ -40,7 +40,6 @@ size_flags_horizontal = 0
 size_flags_vertical = 2
 theme = SubResource("Theme_pbw6q")
 bbcode_enabled = true
-text = "TEST"
 fit_content = true
 scroll_active = false
 autowrap_mode = 0
@@ -74,4 +73,5 @@ script = ExtResource("5_pbw6q")
 [connection signal="player_move" from="Player" to="." method="_on_player_move"]
 [connection signal="render_map" from="Player" to="." method="_on_player_render_map"]
 [connection signal="use_stairs" from="Player" to="." method="_on_player_use_stairs"]
+[connection signal="win" from="Player" to="." method="_on_player_win"]
 [connection signal="player_death" from="Player/Stats" to="Player" method="_on_stats_player_death"]

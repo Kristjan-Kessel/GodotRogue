@@ -1,8 +1,9 @@
 extends Node
 
-
+# Variables for end screens
 var player_name = ""
 var cause_of_death = ""
+var final_gold = 0
 
 var rng_seed: int = -1
 var rng: RandomNumberGenerator = RandomNumberGenerator.new()

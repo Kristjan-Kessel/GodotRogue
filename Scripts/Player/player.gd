@@ -10,6 +10,7 @@ signal drop_item(item)
 signal open_help_menu()
 signal use_stairs()
 signal player_death()
+signal win()
 
 # Movement variables
 var move_direction = Vector2.ZERO

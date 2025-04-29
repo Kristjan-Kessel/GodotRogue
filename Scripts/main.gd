@@ -19,8 +19,8 @@ func _ready():
     Globals.initialize_randomness()
     print("Using seed: ", Globals.rng_seed)
     ui.update_stats(player, turn)
-    new_level()
-    #test_level("final.txt")
+    #new_level()
+    test_level("final.txt")
     #test_level("test.txt")
 
 func get_tile(position: Vector2) -> Tile:
@@ -280,7 +280,7 @@ func _on_player_command_find(direction: Vector2) -> void:
         var left_tile = get_tile(player.position + left_direction)
         var right_tile = get_tile(player.position + right_direction)
         
-        # Makes it so the player always starts moving
+        # Because sometimes the find move will start next to an interesting tile, this will skip the first tile.
         if !bypass_important:
             if left_tile != null && left_tile.is_interesting():
                 break
@@ -353,3 +353,8 @@ func _on_player_use_stairs() -> void:
         new_level()
         ui.update_stats(player,turn)
         render_map()
+
+const WIN_SCENE_PATH := "res://Scenes/WinScreen.tscn"
+func _on_player_win() -> void:
+    Globals.final_gold = player.stats.gold
+    get_tree().change_scene_to_file(WIN_SCENE_PATH)
