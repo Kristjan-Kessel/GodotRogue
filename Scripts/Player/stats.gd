@@ -30,7 +30,10 @@ func _set_current_exp(new_exp):
         current_hp = max_hp
 
 func _set_current_hp(new_hp):
+    if new_hp < current_hp:
+        turns_until_regen = turns_to_regen
     current_hp = clamp(new_hp,0,max_hp)
+        
     if current_hp == 0:
         player_death.emit()
     

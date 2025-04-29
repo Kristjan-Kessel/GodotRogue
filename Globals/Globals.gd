@@ -1,5 +1,8 @@
 extends Node
 
+
+var player_name = ""
+
 var rng_seed: int = -1
 var rng: RandomNumberGenerator = RandomNumberGenerator.new()
 var level_rng: RandomNumberGenerator = RandomNumberGenerator.new()
