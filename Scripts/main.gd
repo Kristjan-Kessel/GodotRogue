@@ -19,8 +19,8 @@ func _ready():
     Globals.initialize_randomness()
     print("Using seed: ", Globals.rng_seed)
     ui.update_stats(player, turn)
-    #new_level()
-    test_level("final.txt")
+    new_level()
+    #test_level("final.txt")
     #test_level("test.txt")
 
 func get_tile(position: Vector2) -> Tile:

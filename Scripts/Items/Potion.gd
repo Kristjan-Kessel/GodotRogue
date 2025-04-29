@@ -3,8 +3,8 @@ class_name Potion
 
 func _init():
     label = "Potion of Healing"
-    description = "Heals you to full health when drank"
+    description = "Restores 10 health when drunk"
     type = Type.USEABLE
 
 func on_use(player: Node):
-    player.stats.current_hp = 100
+    player.stats.current_hp += 10

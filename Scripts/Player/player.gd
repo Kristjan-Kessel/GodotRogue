@@ -102,6 +102,7 @@ func _process(delta: float) -> void:
                     if item.type == item.Type.USEABLE:
                         log_message.emit("Used "+item.label)
                         item.on_use(self)
+                        inventory.erase(item)
                     else:
                         log_message.emit("Invalid item.")
                         current_command = CommandType.NONE
