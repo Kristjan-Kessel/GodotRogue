@@ -8,5 +8,5 @@ func _ready() -> void:
     attack = 20
     label = "Drake"
     ascii = "[color=#a11702]d[/color]"
-    min_exp = 2
+    min_exp = 1
     max_exp = 3

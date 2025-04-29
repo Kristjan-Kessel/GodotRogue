@@ -9,4 +9,4 @@ func _ready() -> void:
     label = "Banshee"
     ascii = "[color=#adffff]b[/color]"
     min_exp = 1
-    max_exp = 1
+    max_exp = 3

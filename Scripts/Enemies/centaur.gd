@@ -8,5 +8,5 @@ func _ready() -> void:
     attack = 14
     label = "Centaur"
     ascii = "[color=#632d01]c[/color]"
-    min_exp = 2
+    min_exp = 1
     max_exp = 3
