@@ -135,7 +135,7 @@ static func generate_enemies(spawning_tiles: Array, rooms: Array, player: Node):
     elif player.stats.level <= 6:
         enemy_pool = Pools.mid_tier_enemies
     elif player.stats.level <= 9:
-        enemy_pool = Globals.high_tier_enemies
+        enemy_pool = Pools.high_tier_enemies
     
     var amount_to_spawn = Globals.level_rng.randi_range(Pools.min_enemies,Pools.max_enemies)
     var non_skip_rooms = rooms.filter(func(room):

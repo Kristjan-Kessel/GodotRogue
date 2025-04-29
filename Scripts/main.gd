@@ -47,7 +47,7 @@ func update_astar():
         for x in range(map_data[y].size()):
             var tile = map_data[y][x]
             if tile.is_walkable:
-                if (tile.entity == null or tile.entity == player):
+                if tile.entity == null or tile.entity == player:
                     connect_tile(tile,astar)
                 connect_tile(tile,astar_bypass)
 
@@ -75,6 +75,7 @@ func spawn_enemies_from_list(enemy_list):
 
         var tile = get_tile(enemy_data.position)
         tile.entity = enemy
+        astar.remove_point(tile.id)
         enemy.enemy_move.connect(move_enemy)
 
 func test_level(file: String):
@@ -96,8 +97,8 @@ func new_level():
     for child in enemies.get_children():
         child.free()
     
-    spawn_enemies_from_list(level_data[1])
     update_astar()
+    spawn_enemies_from_list(level_data[1])
     reveal_room(get_tile(player.position))
     render_map()
 
@@ -185,9 +186,6 @@ func move_enemy(new_position: Vector2, enemy: Enemy):
         elif target_tile.entity == player:
             log_message = enemy.attack_player(player)
             render_map()
-    var point_id = get_tile(enemy.position).id
-    if astar.has_point(point_id):
-        astar.remove_point(point_id)
 
 func move_player(new_position: Vector2) -> bool:
     
@@ -255,6 +253,7 @@ func on_action_taken():
             enemy.can_see_player = is_visible
             var path = astar.get_point_path(tile.id, player_tile.id)
             enemy.on_turn(path,bypass_path)
+            astar.remove_point(get_tile(enemy.position).id)
     
     render_map()
     turn += 1
@@ -349,7 +348,7 @@ func _on_player_open_help_menu() -> void:
 func _on_player_use_stairs() -> void:
     var tile = get_tile(player.position)
     if tile.type == "STAIRS":
-        player.stats.level += 1
+        player.stats.level += 3
         new_level()
         ui.update_stats(player,turn)
         render_map()
